@@ -753,10 +753,13 @@ app.get('/login.html', (req, res) => {
 });
 
 app.get('/check-login', (req, res) => {
-    if (req.session.user) {
+    console.log('[CHECK-LOGIN] Session:', req.session); // ✅ LOG DEBUG
+    console.log('[CHECK-LOGIN] User ID:', req.session?.user); // ✅ LOG DEBUG
+    
+    if (req.session && req.session.user) {
         res.json({ loggedIn: true });
     } else {
-        res.status(401).json({ loggedIn: false });
+        res.json({ loggedIn: false }); // ✅ MUDAR DE res.status(401) PARA res.json()
     }
 });
 

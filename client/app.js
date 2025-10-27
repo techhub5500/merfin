@@ -157,7 +157,7 @@ async function fetchCompanyIndicatorsByName(name) {
 // ========== FUNÇÕES DE PERFIL ==========
 async function loadProfile() {
     try {
-        const response = await fetch(`${API_URL}/load-profile`);
+        const response = await fetch(`${API_URL}/load-profile`, { credentials: 'include' });
         if (response.ok) {
             const data = await response.json();
             userProfile = data.profileData || {};
@@ -173,11 +173,7 @@ async function loadProfile() {
 
 async function saveProfile() {
     try {
-        const response = await fetch(`${API_URL}/save-profile`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ profileData: userProfile })
-        });
+        const response = await fetch(`${API_URL}/save-profile`, { method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ profileData: userProfile }) });
         if (!response.ok) {
             console.error('Erro ao salvar perfil');
         }
@@ -461,17 +457,17 @@ window.researchCompany = async function(ticker) {
 // ========== EVENT LISTENERS ==========
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar se o usuário está logado
-    fetch(`${API_URL}/check-login`)
-        .then(response => response.json())
-        .then(data => {
-            if (!data.loggedIn) {
-                window.location.href = '/login.html';
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao verificar login:', error);
+    fetch(`${API_URL}/check-login`, { credentials: 'include' }) // ✅ ADICIONAR
+    .then(response => response.json())
+    .then(data => {
+        if (!data.loggedIn) {
             window.location.href = '/login.html';
-        });
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao verificar login:', error);
+        window.location.href = '/login.html';
+    });
 
     // ========== NOTÍCIAS ==========
     const noticiasBtn = document.getElementById('noticias-btn');
@@ -504,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingOverlay.style.display = 'flex';
             loadingText.textContent = 'Carregando newsletter do dia...';
 
-            fetch(`${API_URL}/newsletter`)
+            fetch(`${API_URL}/newsletter`, { credentials: 'include' })
                 .then(response => response.json())
                 .then(data => {
                     // Esconder loading
@@ -594,9 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const exitBtn = document.getElementById('exit-btn');
 if (exitBtn) {
     exitBtn.addEventListener('click', function() {
-        fetch(`${API_URL}/logout`, {  // ✅ ADICIONAR API_URL
-            method: 'POST'
-        })
+        fetch(`${API_URL}/logout`, { method: 'POST', credentials: 'include' })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -613,9 +607,7 @@ if (exitBtn) {
     const newChatBtn = document.getElementById('new-chat-btn');
     if (newChatBtn) {
         newChatBtn.addEventListener('click', function() {
-            fetch(`${API_URL}/new-chat`, {
-                method: 'POST'
-            })
+            fetch(`${API_URL}/new-chat`, { method: 'POST', credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 if (data.chatId) {
@@ -646,7 +638,7 @@ if (exitBtn) {
     if (historyBtn && historyPanel) {
         historyBtn.addEventListener('click', function() {
             historyPanel.style.display = 'flex';
-        fetch(`${API_URL}/history`)  
+        fetch(`${API_URL}/history`, { credentials: 'include' })  
             .then(response => response.json())
                 .then(data => {
                     chatsData = data;
@@ -931,7 +923,7 @@ if (exitBtn) {
                 if (!currentChatId) {
                     console.log('Nenhum chat ativo, criando novo...');
                     try {
-                        const newChatResponse = await fetch(`${API_URL}/new-chat`, { method: 'POST' });
+                        const newChatResponse = await fetch(`${API_URL}/new-chat`, { method: 'POST', credentials: 'include' })
                         const newChatData = await newChatResponse.json();
                         if (newChatData.chatId) {
                             currentChatId = newChatData.chatId;
@@ -960,9 +952,10 @@ if (exitBtn) {
                     });
 
                     const response = await fetch(`${API_URL}/chat`, {
-                        method: 'POST',
-                        body: formData,
-                    });
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+});
                     
                     const data = await response.json();
                     
