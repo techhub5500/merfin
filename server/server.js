@@ -37,17 +37,6 @@ const logger = winston.createLogger({
 
 const upload = multer({ dest: 'uploads/' });
 
-const corsOptions = {
-    origin: process.env.NODE_ENV === 'production'
-        ? 'https://merfin-home.onrender.com' // ✅ Seu domínio Render
-        : ['http://localhost:3000', 'http://localhost:3001'],
-    credentials: true, // ✅ CRÍTICO para sessões
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-};
-
-app.use(cors(corsOptions)); // ✅ SUBSTITUIR app.use(cors())
-
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, '../client')));
@@ -111,15 +100,13 @@ app.use(limiter);
 
 // Sessões com MongoDB Store
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'dladhjsbfcdskyfbgkjdfbkjudhf6vd549@365*j',
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    secret: process.env.SESSION_SECRET || 'your_super_secret_key', // Use variável de ambiente
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }), // Persistente
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: process.env.NODE_ENV === 'production', // ✅ HTTPS em produção
-        httpOnly: true, // ✅ Proteger contra XSS
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ✅ CORS
-        maxAge: 24 * 60 * 60 * 1000
+        secure: false, // Defina true em produção com HTTPS
+        maxAge: 24 * 60 * 60 * 1000 // 24 horas
     }
 }));
 
@@ -769,45 +756,23 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     try {
-        const { identifier, password } = req.body;
-        
-        // ✅ Validação de entrada
-        if (!identifier || !password) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'E-mail/nome e senha são obrigatórios' 
-            });
-        }
-        
-        const user = await User.findOne({ $or: [{ email: identifier }, { name: identifier }] });
-        
+        const { identifier, password } = req.body;  // Mudança: Recebe 'identifier'
+        const user = await User.findOne({ $or: [{ email: identifier }, { name: identifier }] });  // Mudança: Busca por e-mail OU nome
         if (user && await bcrypt.compare(password, user.password)) {
             // Verificar assinatura
             if (user.assinatura !== 'ativa') {
                 const message = user.assinatura === 'inativa' 
                     ? 'Sua conta está inativa. Entre em contato com o suporte.' 
                     : 'Pagamento pendente. Entre em contato com o suporte para regularizar.';
-                return res.status(403).json({ success: false, message }); // ✅ Status 403
+                return res.json({ success: false, message });
             }
-            
             req.session.user = user._id;
-            
-            // ✅ ADICIONAR: Aguardar salvamento da sessão
-            req.session.save((err) => {
-                if (err) {
-                    logger.error('Erro ao salvar sessão:', err);
-                    return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
-                }
-                
-                logger.info(`Login bem-sucedido: ${user.email}`);
-                return res.json({ success: true }); // ✅ Retornar JSON válido
-            });
+            res.json({ success: true });
         } else {
-            return res.status(401).json({ success: false, message: 'Credenciais inválidas' }); // ✅ Status 401
+            res.json({ success: false, message: 'Credenciais inválidas' });
         }
     } catch (error) {
-        logger.error('Erro no login:', error);
-        return res.status(500).json({ success: false, message: 'Erro interno no servidor' }); // ✅ SEMPRE retornar JSON
+        res.json({ success: false, message: error.message });
     }
 });
 
