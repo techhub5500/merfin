@@ -112,14 +112,20 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Sessões com MongoDB Store
+app.set('trust proxy', 1);
+
+// Sessões com MongoDB Store
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your_super_secret_key', // Use variável de ambiente
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }), // Persistente
+    secret: process.env.SESSION_SECRET || 'your_super_secret_key',
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     resave: false,
     saveUninitialized: false,
-    cookie: { 
-        secure: false, // Defina true em produção com HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // true em produção (HTTPS)
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // necessário para cross-site
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // permite subdomínios onrender
+        maxAge: 24 * 60 * 60 * 1000
     }
 }));
 
@@ -769,23 +775,29 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     try {
-        const { identifier, password } = req.body;  // Mudança: Recebe 'identifier'
-        const user = await User.findOne({ $or: [{ email: identifier }, { name: identifier }] });  // Mudança: Busca por e-mail OU nome
+        const { identifier, password } = req.body;
+        const user = await User.findOne({ $or: [{ email: identifier }, { name: identifier }] });
         if (user && await bcrypt.compare(password, user.password)) {
-            // Verificar assinatura
             if (user.assinatura !== 'ativa') {
-                const message = user.assinatura === 'inativa' 
-                    ? 'Sua conta está inativa. Entre em contato com o suporte.' 
+                const message = user.assinatura === 'inativa'
+                    ? 'Sua conta está inativa. Entre em contato com o suporte.'
                     : 'Pagamento pendente. Entre em contato com o suporte para regularizar.';
                 return res.json({ success: false, message });
             }
             req.session.user = user._id;
-            res.json({ success: true });
+            // salvar sessão antes de responder
+            req.session.save((err) => {
+                if (err) {
+                    logger.error('Erro ao salvar sessão:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
+                }
+                return res.json({ success: true });
+            });
         } else {
-            res.json({ success: false, message: 'Credenciais inválidas' });
+            return res.json({ success: false, message: 'Credenciais inválidas' });
         }
     } catch (error) {
-        res.json({ success: false, message: error.message });
+        return res.json({ success: false, message: error.message });
     }
 });
 

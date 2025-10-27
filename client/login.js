@@ -1,22 +1,16 @@
-// ========== CONFIGURAÇÃO DE AMBIENTE ==========
+// ==========================================
+// CONFIGURAÇÃO DE AMBIENTE
+// ==========================================
 const getApiUrl = () => {
     // Se estiver em produção (Render)
     if (window.location.hostname === 'merfin-home.onrender.com') {
-        return 'https://merfin-server.onrender.com'; // ✅ Auth, chat, perfil
+        return 'https://merfin-server.onrender.com'; // ✅ CORRIGIDO
     }
-    return 'http://localhost:3000';
+    // Se estiver em desenvolvimento local
+    return 'http://localhost:3000'; // Porta do servidor principal
 };
 
-const getDataApiUrl = () => {
-    // Se estiver em produção (Render)
-    if (window.location.hostname === 'merfin-home.onrender.com') {
-        return 'https://merfin-dado.onrender.com'; // ✅ Company data
-    }
-    return 'http://localhost:3001';
-};
-
-const API_URL = getApiUrl(); // Auth, chat, perfil, newsletter
-const DATA_API_URL = getDataApiUrl(); // Company data
+const API_URL = getApiUrl();
 
 // ==========================================
 // EVENT LISTENERS
@@ -57,11 +51,12 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     const identifier = document.getElementById('login-identifier').value;
     const password = document.getElementById('login-password').value;
 
-    fetch(`${API_URL}/login`, {  // ✅ ADICIONAR API_URL
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, password })
-    })
+    fetch(`${API_URL}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include', // ← importante
+    body: JSON.stringify({ identifier, password })
+})
     .then(response => response.json())
     .then(data => {
         if (data.success) {
@@ -95,11 +90,12 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
         return;
     }
 
-    fetch(`${API_URL}/register`, {  // ✅ ADICIONAR API_URL
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, cpf, telefone })
-    })
+    fetch(`${API_URL}/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include', // ← importante
+    body: JSON.stringify({ name, email, password, cpf, telefone })
+})
     .then(response => response.json())
     .then(data => {
         if (data.success) {
