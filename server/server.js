@@ -52,6 +52,14 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use((req, res, next) => {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('[DEBUG] Request from:', req.headers.origin);
+    console.log('[DEBUG] Cookies received:', req.headers.cookie);
+    console.log('[DEBUG] Method:', req.method, req.path);
+    next();
+});
+
 app.use(express.static(path.join(__dirname, '../client')));
 
 mongoose.connect(process.env.MONGO_URI)
@@ -121,13 +129,22 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // true em produção (HTTPS)
+        secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // necessário para cross-site
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // permite subdomínios onrender
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
         maxAge: 24 * 60 * 60 * 1000
     }
 }));
+
+// ✅ MIDDLEWARE DE DEBUG (ADICIONAR)
+app.use((req, res, next) => {
+    console.log('[DEBUG] Session ID:', req.sessionID);
+    console.log('[DEBUG] Session User:', req.session?.user);
+    console.log('[DEBUG] Session Cookie:', req.session?.cookie);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    next();
+});
 
 function summarizeProfile(profileData) {
     if (!profileData || Object.keys(profileData).length === 0) {
@@ -777,29 +794,51 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
+    console.log('\n🔐 [LOGIN] Tentativa de login iniciada');
+    console.log('[LOGIN] Body:', req.body);
+    console.log('[LOGIN] Headers:', req.headers);
+    
     try {
         const { identifier, password } = req.body;
         const user = await User.findOne({ $or: [{ email: identifier }, { name: identifier }] });
+        
         if (user && await bcrypt.compare(password, user.password)) {
             if (user.assinatura !== 'ativa') {
                 const message = user.assinatura === 'inativa'
                     ? 'Sua conta está inativa. Entre em contato com o suporte.'
                     : 'Pagamento pendente. Entre em contato com o suporte para regularizar.';
+                console.log('[LOGIN] ❌ Assinatura inativa:', user.assinatura);
                 return res.json({ success: false, message });
             }
+            
             req.session.user = user._id;
+            console.log('[LOGIN] ✅ Usuário encontrado:', user.email);
+            console.log('[LOGIN] Session ANTES de salvar:', req.session);
+            
             // salvar sessão antes de responder
             req.session.save((err) => {
                 if (err) {
+                    console.error('[LOGIN] ❌ Erro ao salvar sessão:', err);
                     logger.error('Erro ao salvar sessão:', err);
                     return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
                 }
+                
+                console.log('[LOGIN] ✅ Sessão salva com sucesso');
+                console.log('[LOGIN] Session ID:', req.sessionID);
+                console.log('[LOGIN] Session Cookie Config:', req.session.cookie);
+                console.log('[LOGIN] Response Headers que serão enviados:');
+                
+                // Forçar envio do Set-Cookie
+                res.set('Set-Cookie', `connect.sid=${req.sessionID}; Path=/; HttpOnly; ${req.session.cookie.secure ? 'Secure;' : ''} SameSite=${req.session.cookie.sameSite}; ${req.session.cookie.domain ? `Domain=${req.session.cookie.domain};` : ''} Max-Age=${req.session.cookie.maxAge / 1000}`);
+                
                 return res.json({ success: true });
             });
         } else {
+            console.log('[LOGIN] ❌ Credenciais inválidas');
             return res.json({ success: false, message: 'Credenciais inválidas' });
         }
     } catch (error) {
+        console.error('[LOGIN] ❌ Erro no catch:', error);
         return res.json({ success: false, message: error.message });
     }
 });
