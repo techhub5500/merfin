@@ -26,7 +26,7 @@ function hideNotificationModal() {
 // Event listeners para o modal
 document.getElementById('close-modal').addEventListener('click', hideNotificationModal);
 document.getElementById('support-button').addEventListener('click', function() {
-    window.open('https://wa.link/37wkdq', '_blank');  // Mudança: Abre o link do WhatsApp em nova aba
+    window.open('https://wa.link/37wkdq', '_blank');
 });
 
 document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -34,7 +34,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     const identifier = document.getElementById('login-identifier').value;
     const password = document.getElementById('login-password').value;
 
-    fetch(`${API_BASE}/login`, {  // Mudança: use API_BASE
+    fetch('https://merfin-server.onrender.com/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, password })
@@ -44,7 +44,6 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
         if (data.success) {
             window.location.href = '/';
         } else {
-            // Mostra modal em vez de alert
             if (Array.isArray(data.messages)) {
                 showNotificationModal(data.messages);
             } else {
@@ -63,13 +62,12 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
     const cpf = document.getElementById('register-cpf').value;
     const telefone = document.getElementById('register-telefone').value;
 
-    // Validação básica
     if (!cpf || !telefone) {
         alert('CPF e telefone são obrigatórios.');
         return;
     }
 
-    fetch(`${API_BASE}/register`, {  // Mudança: use API_BASE
+    fetch('https://merfin-server.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, cpf, telefone })
