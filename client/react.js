@@ -10,10 +10,10 @@
     const getApiUrl = () => {
     // Se estiver em produção (Render)
     if (window.location.hostname === 'merfin-home.onrender.com') {
-        return 'https://merfin-home.onrender.com';
+        return 'https://merfin-server.onrender.com'; // ✅ CORRIGIDO
     }
     // Se estiver em desenvolvimento local
-    return 'http://localhost:3000'; // ou a porta que você usa
+    return 'http://localhost:3000'; // Porta do servidor de chat
 };
 
 const API_URL = getApiUrl();

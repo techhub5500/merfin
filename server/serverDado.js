@@ -10,7 +10,18 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production'
+        ? [
+            'https://merfin-home.onrender.com',      // ✅ Frontend
+            'https://merfin-server.onrender.com',    // ✅ Servidor principal (pode fazer requests)
+          ]
+        : ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 // Linha 13 (após CORS)
 app.use(helmet());

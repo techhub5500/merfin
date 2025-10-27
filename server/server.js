@@ -37,7 +37,20 @@ const logger = winston.createLogger({
 
 const upload = multer({ dest: 'uploads/' });
 
-app.use(cors());
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production'
+        ? [
+            'https://merfin-home.onrender.com',      // ✅ Frontend
+            'https://merfin-server.onrender.com',    // ✅ Servidor principal
+            'https://merfin-dado.onrender.com'       // ✅ Servidor de dados
+          ]
+        : ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true, // ✅ CRÍTICO para sessões
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, '../client')));
 

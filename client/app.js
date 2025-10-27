@@ -2,18 +2,16 @@
 const getApiUrl = () => {
     // Se estiver em produção (Render)
     if (window.location.hostname === 'merfin-home.onrender.com') {
-        return 'https://merfin-home.onrender.com';
+        return 'https://merfin-server.onrender.com'; // ✅ Auth, chat, perfil
     }
-    // Servidor principal (auth, chat, perfil)
     return 'http://localhost:3000';
 };
 
 const getDataApiUrl = () => {
     // Se estiver em produção (Render)
     if (window.location.hostname === 'merfin-home.onrender.com') {
-        return 'https://merfin-home.onrender.com'; // Ambos na mesma URL em produção
+        return 'https://merfin-dado.onrender.com'; // ✅ Company data
     }
-    // Servidor de dados (company-cards, indicators)
     return 'http://localhost:3001';
 };
 
