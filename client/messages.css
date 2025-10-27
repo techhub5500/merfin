@@ -1,0 +1,389 @@
+.message {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: -0.011em;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+}
+
+.message.user {
+    background: var(--color-surface-user);
+    color: var(--color-text-primary);
+    align-self: flex-end;
+    margin-left: auto;
+    border-bottom-right-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+}
+
+.message.ai {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    align-self: flex-start;
+    margin-right: auto;
+    border-bottom-left-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+}
+
+.message.user::before {
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 12px;
+    margin-bottom: var(--spacing-xs);
+    display: block;
+}
+
+.message.ai::before {
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 12px;
+    margin-bottom: var(--spacing-xs);
+    display: block;
+}
+
+/* Para garantir que as mensagens sejam exibidas em coluna */
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== SISTEMA DE ETAPAS PROGRESSIVAS (GRID 2x3 - 30% MENOR) ===== */
+.thinking-progress {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colunas */
+    grid-template-rows: repeat(2, 1fr); /* 2 linhas */
+    gap: 8px; /* Reduzido de 12px para 8px */
+    padding: 14px; /* Reduzido de 20px para 14px (30% menor) */
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 215, 0, 0.02));
+    border-radius: 10px; /* Reduzido de 12px */
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    max-width: 520px; /* Reduzido de ~750px (ajustado para grid) */
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column; /* Ícone em cima, texto embaixo */
+    align-items: center;
+    justify-content: center;
+    gap: 6px; /* Reduzido de 12px */
+    padding: 8px 10px; /* Reduzido de 10px 15px */
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 70px; /* Reduzido de ~100px */
+}
+
+.progress-step::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, 
+        rgba(255, 215, 0, 0.1),
+        rgba(255, 215, 0, 0.05)
+    );
+    transition: width 0.6s ease;
+}
+
+.progress-step.active::before {
+    width: 100%;
+}
+
+.progress-step.completed {
+    background: rgba(46, 204, 113, 0.1);
+    border: 2px solid #2ecc71; /* Borda ao invés de border-left */
+}
+
+.step-icon {
+    font-size: 16px; /* Reduzido de 18px (30% menor: 18 * 0.7 ≈ 12.6, ajustado para 16) */
+    width: 24px; /* Reduzido de 28px */
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.progress-step.pending .step-icon {
+    color: #7f8c8d;
+    background: rgba(127, 140, 141, 0.1);
+}
+
+.progress-step.active .step-icon {
+    color: #FFD700;
+    background: rgba(255, 215, 0, 0.15);
+    animation: pulse-icon 1.5s ease-in-out infinite;
+}
+
+.progress-step.completed .step-icon {
+    color: #2ecc71;
+    background: rgba(46, 204, 113, 0.15);
+    animation: check-bounce 0.5s ease;
+}
+
+.step-text {
+    font-size: 11px; /* Reduzido de 14px (30% menor: 14 * 0.7 ≈ 9.8, ajustado para 11) */
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.progress-step.pending .step-text {
+    color: #95a5a6;
+}
+
+.progress-step.active .step-text {
+    color: #FFD700;
+    font-weight: 600;
+}
+
+.progress-step.completed .step-text {
+    color: #2ecc71;
+}
+
+.step-duration {
+    font-size: 9px; /* Reduzido de 11px */
+    color: #7f8c8d;
+    font-weight: 400;
+    text-align: center;
+}
+
+/* Animações */
+@keyframes pulse-icon {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+@keyframes check-bounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Spinner customizado para etapa ativa */
+.step-icon .fa-spinner {
+    animation: spin-smooth 1s linear infinite;
+}
+
+@keyframes spin-smooth {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Glassmorphism styles */
+.glassmorphism-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,212,255,0.1)); }
+  50% { background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(255,255,255,0.1)); }
+  100% { background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,212,255,0.1)); }
+}
+
+/* ===== MEDIA QUERIES PARA RESPONSIVIDADE ===== */
+
+/* Widescreen (1440px e acima) */
+@media (min-width: 1440px) {
+    .message {
+        max-width: 80%;
+        font-size: 16px;
+        padding: var(--spacing-lg);
+    }
+
+    .message.user::before,
+    .message.ai::before {
+        font-size: 14px;
+    }
+
+    .thinking-progress {
+        padding: 18px;
+        gap: 10px;
+        max-width: 600px;
+    }
+
+    .progress-step {
+        padding: 10px 12px;
+        min-height: 80px;
+    }
+
+    .step-icon {
+        font-size: 18px;
+        width: 28px;
+        height: 28px;
+    }
+
+    .step-text {
+        font-size: 12px;
+    }
+
+    .step-duration {
+        font-size: 10px;
+    }
+}
+
+/* Tablets e telas médias (1024px a 1439px) */
+@media (max-width: 1024px) {
+    .message {
+        max-width: 75%;
+        font-size: 14px;
+        padding: var(--spacing-sm);
+    }
+
+    .thinking-progress {
+        padding: 12px;
+        gap: 7px;
+        max-width: 480px;
+    }
+
+    .progress-step {
+        padding: 7px 9px;
+        min-height: 65px;
+    }
+
+    .step-icon {
+        font-size: 15px;
+        width: 22px;
+        height: 22px;
+    }
+
+    .step-text {
+        font-size: 10px;
+    }
+
+    .step-duration {
+        font-size: 8px;
+    }
+}
+
+/* Tablets pequenas e celulares grandes (768px a 1023px) */
+@media (max-width: 768px) {
+    .message {
+        max-width: 85%;
+        font-size: 13px;
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .message.user::before,
+    .message.ai::before {
+        font-size: 11px;
+    }
+
+    .thinking-progress {
+        padding: 10px;
+        gap: 6px;
+        max-width: 100%;
+        grid-template-columns: repeat(2, 1fr); /* 2 colunas em tablet */
+        grid-template-rows: repeat(3, 1fr); /* 3 linhas */
+    }
+
+    .progress-step {
+        padding: 6px 8px;
+        min-height: 60px;
+    }
+
+    .step-icon {
+        font-size: 14px;
+        width: 20px;
+        height: 20px;
+    }
+
+    .step-text {
+        font-size: 10px;
+    }
+
+    .step-duration {
+        font-size: 8px;
+    }
+}
+
+/* Celulares (480px a 767px) */
+@media (max-width: 480px) {
+    .message {
+        max-width: 95%;
+        font-size: 12px;
+        padding: var(--spacing-xs);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .message.user::before,
+    .message.ai::before {
+        font-size: 10px;
+    }
+
+    .thinking-progress {
+        padding: 8px;
+        gap: 5px;
+        grid-template-columns: 1fr; /* 1 coluna em mobile */
+        grid-template-rows: repeat(6, 1fr); /* 6 linhas */
+    }
+
+    .progress-step {
+        padding: 5px 7px;
+        min-height: 50px;
+        flex-direction: row; /* Ícone ao lado do texto em mobile */
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .step-icon {
+        font-size: 13px;
+        width: 18px;
+        height: 18px;
+    }
+
+    .step-text {
+        font-size: 9px;
+        text-align: left;
+    }
+
+    .step-duration {
+        display: none; /* Ocultar duração em mobile */
+    }
+}
+
+/* iPhone e celulares pequenos (até 414px) */
+@media (max-width: 414px) {
+    .message {
+        max-width: 98%;
+        font-size: 11px;
+        padding: var(--spacing-xs);
+    }
+
+    .thinking-progress {
+        padding: 7px;
+        gap: 4px;
+    }
+
+    .progress-step {
+        padding: 4px 6px;
+        min-height: 45px;
+    }
+
+    .step-icon {
+        font-size: 12px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .step-text {
+        font-size: 8px;
+    }
+}

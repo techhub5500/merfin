@@ -1,0 +1,48 @@
+{
+  "name": "prochatt-finance",
+  "version": "1.0.0",
+  "description": "Servidor Express para o Prochatt Finance",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "concurrently \"npm run start:server\" \"npm run start:serverDado\"",
+    "start:server": "nodemon server.js",
+    "start:serverDado": "nodemon serverDado.js",
+    "dev": "concurrently \"npm run start:server\" \"npm run start:serverDado\""
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "brapi": "^1.0.0",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "cron": "^4.3.3",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.11.0",
+    "mongoose": "^8.19.1",
+    "multer": "^2.0.2",
+    "node": "^22.21.0",
+    "node-cache": "^5.1.2",
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.23.2",
+    "path": "^0.12.7",
+    "pdf-parse": "^2.1.7",
+    "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "keywords": [],
+  "author": "Edmar",
+  "license": "ISC"
+}

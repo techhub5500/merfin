@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>IA do Investidor</title>
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="messages.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="react.css">
+    
+    <!-- Marked.js para Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Highlight.js para código -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- React via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- React Renderer (NOVO) -->
+    <script src="react.js" defer></script>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <img src="logo.png" alt="Logo" class="logo">
+        <button id="toggle-sidebar" class="toggle-btn">☰</button>
+    </div>
+    <div class="dark-mode-toggle">
+        <label for="dark-mode-switch" class="toggle-label">
+            <input type="checkbox" id="dark-mode-switch" class="toggle-input">
+            <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-text">Modo Escuro</span>
+    </div>
+     <nav class="sidebar-nav">
+        <a href="#" data-page="chat" data-tooltip="Ir para Chat">Merfin</a>
+        <button id="new-chat-btn" class="sidebar-btn" data-tooltip="Novo Chat"><i class="fas fa-plus"></i></button>
+        <button id="history-btn" class="sidebar-btn" data-tooltip="Histórico"><i class="fas fa-history"></i></button>
+        <a href="#" data-page="perfil" data-tooltip="Perfil de Investimentos"><i class="fas fa-user"></i></a>
+    </nav>
+    <div class="sidebar-footer">
+        <button id="exit-btn" data-tooltip="Sair da aplicação">Sair</button>
+    </div>
+</div>
+    <div class="content">
+        <div id="chat-section" class="page-section">
+            <div class="chat-container">
+                <div class="chat-messages" id="messages">
+                    <!-- Removido: <h2>escolha sua empresa para analisar</h2> -->
+                    <div id="search-bar" class="search-bar">
+                        <input type="text" id="company-search" placeholder="Pesquisar empresa por nome ou ticker..." />
+                        <button id="search-btn"><i class="fas fa-search"></i></button>
+                        <ul id="suggestions" class="suggestions-list" style="display: none;"></ul>
+                    </div>
+                    <div id="company-cards"></div>  <!-- Container para o card pesquisado -->
+<p id="initial-text" style="color: #ffffff; font-size: 30px; text-align: center; margin: var(--spacing-lg) 0;">
+    De qual investimentos vamos falar hoje?
+</p>
+                </div>
+                <div class="chat-input-area">
+                    <div class="documents-indicator" id="documents-indicator" style="display: none;">
+                        <i class="fas fa-file-alt"></i>
+                        <span id="documents-count">0</span> documentos carregados
+                        <button id="view-documents-btn" class="view-docs-btn">Ver</button>
+                    </div>
+                    <div class="input-wrapper">
+                        <textarea id="message-input" name="message" placeholder="Digite sua mensagem..." rows="1" style="resize: none;"></textarea>
+                        <div class="input-bottom">
+    <div class="left-elements">
+        <button class="input-option" id="noticias-btn" data-tooltip="Newsletter diaria"><i class="fas fa-newspaper spinning-icon" style="font-size: 20px; color: #FFD700;"></i></button>
+        <!-- Substitua os botões antigos pelo container do carrossel -->
+        <div id="suggestions-carousel" class="suggestions-carousel"></div>
+        <input type="file" id="file-pdf" accept=".pdf" multiple style="display: none;">
+        <input type="file" id="file-text" accept=".txt,.csv,.docx,.xlsx" multiple style="display: none;">
+    </div>
+    <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MOVIDO: Seção de Perfil fora de #chat-section -->
+        <div id="perfil-section" class="page-section" style="display: none;">
+            <div class="chat-container">
+                <h2>Perfil de Investimentos</h2>
+<p style="color: var(--color-text-secondary); font-size: 17px; text-align: center;">
+    Esta seção permite que você compartilhe informações sobre seu perfil de investimento. Não é obrigatório responder, mas quanto mais detalhes você fornecer, melhor o agente poderá personalizar suas recomendações e análises.
+</p>
+                <div id="profile-content"></div>  <!-- Container para React renderizar carrossel ou blocos -->
+            </div>
+            
+            <!-- Modal para editar bloco inteiro (usado por "Editar tudo") -->
+            <div id="edit-block-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h3 id="edit-block-title">Editar Bloco</h3>
+                    <form id="edit-block-form">
+                        <!-- Campos dinâmicos inseridos via JS -->
+                    </form>
+                    <button id="save-block-btn">Salvar</button>
+                    <button id="close-edit-modal">Fechar</button>
+                </div>
+            </div>
+            
+            <!-- Modal para editar resposta individual -->
+            <div id="edit-single-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h3 id="edit-single-title">Editar Resposta</h3>
+                    <form id="edit-single-form">
+                        <!-- Campo único inserido via JS -->
+                    </form>
+                    <button id="save-single-btn">Salvar</button>
+                    <button id="close-single-modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Histórico -->
+    <div id="history-panel" class="history-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="edit-btn" id="close-history-btn">Fechar</button>
+            <h3>Histórico de Chats</h3>
+            <input type="text" id="history-search" placeholder="Pesquisar por data ou conteúdo...">
+            <ul id="history-list">
+                <li>Nenhum histórico disponível (requer backend para armazenar).</li>
+            </ul>
+            <button id="delete-all-history-btn">Apagar Todo o Histórico</button>
+        </div>
+    </div>
+
+    <!-- Overlay de Loading para Notícias -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+        <i class="fas fa-newspaper spinning-icon" style="font-size: 50px; color: #FFD700; margin-bottom: 20px;"></i>
+        <p id="loading-text" style="color: #ffffff; font-size: 18px; font-family: 'Poppins', sans-serif;"></p>
+    </div>
+
+    <!-- Modal de Notícias -->
+    <div id="noticias-modal" class="modal-overlay" style="display: none;" role="dialog" aria-labelledby="noticias-title">
+    <div class="modal-content">
+        <button id="close-noticias-modal" class="modal-close" aria-label="Fechar modal">×</button>
+        <h4 id="noticias-title">Newsletter Merfin</h4>
+        <div id="noticias-content" class="noticias-content"></div>
+    </div>
+    </div>
+
+    <!-- Templates movidos do app.js -->
+    <template id="progress-template">
+        <div class="thinking-progress">
+            <div class="progress-step pending" data-step="receiving">
+                <div class="step-icon">
+                    <i class="fa-solid fa-download"></i>
+                </div>
+                <span class="step-text">Recebendo sua mensagem</span>
+            </div>
+            <div class="progress-step pending" data-step="analyzing">
+                <div class="step-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <span class="step-text">Analisando contexto</span>
+            </div>
+            <div class="progress-step pending" data-step="searching">
+                <div class="step-icon">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <span class="step-text">Buscando dados relevantes</span>
+            </div>
+            <div class="progress-step pending" data-step="processing">
+                <div class="step-icon">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <span class="step-text">Processando informações</span>
+            </div>
+            <div class="progress-step pending" data-step="generating">
+                <div class="step-icon">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="step-text">Gerando resposta otimizada</span>
+            </div>
+            <div class="progress-step pending" data-step="finalizing">
+                <div class="step-icon">
+                    <i class="fa-solid fa-check-circle"></i>
+                </div>
+                <span class="step-text">Finalizando análise</span>
+            </div>
+        </div>
+    </template>
+
+    <template id="block1-fields">
+        <label>Primeiro Nome:</label>
+        <input type="text" name="nome" placeholder="Digite seu nome" style="width: 40%;">
+        <label>Qual é o valor total aproximado do seu patrimônio investível hoje?</label>
+        <select name="patrimonio">
+            <option value="">Selecione</option>
+            <option value="Até R$ 50 mil">Até R$ 50 mil</option>
+            <option value="De R$ 50 mil a R$ 200 mil">De R$ 50 mil a R$ 200 mil</option>
+            <option value="De R$ 200 mil a R$ 500 mil">De R$ 200 mil a R$ 500 mil</option>
+            <option value="De R$ 500 mil a R$ 1 milhão">De R$ 500 mil a R$ 1 milhão</option>
+            <option value="De R$ 1 milhão a R$ 3 milhões">De R$ 1 milhão a R$ 3 milhões</option>
+            <option value="De R$ 3 milhões a R$ 5 milhões">De R$ 3 milhões a R$ 5 milhões</option>
+            <option value="De R$ 5 milhões a R$ 10 milhões">De R$ 5 milhões a R$ 10 milhões</option>
+            <option value="De R$ 10 milhões a R$ 50 milhões">De R$ 10 milhões a R$ 50 milhões</option>
+            <option value="Acima de R$ 50 milhões">Acima de R$ 50 milhões</option>
+        </select>
+        <label>Com que frequência você aporta recursos novos nos seus investimentos?</label>
+        <select name="aportes">
+            <option value="">Selecione</option>
+            <option value="Mensalmente">Mensalmente</option>
+            <option value="Trimestralmente">Trimestralmente</option>
+            <option value="Semestralmente">Semestralmente</option>
+            <option value="Anualmente">Anualmente</option>
+            <option value="Aportes esporádicos">Aportes esporádicos (sem periodicidade)</option>
+            <option value="Não faço aportes regulares">Não faço aportes regulares</option>
+        </select>
+        <label>Você possui reserva de emergência consolidada?</label>
+        <select name="reserva">
+            <option value="">Selecione</option>
+            <option value="Sim, tenho pelo menos 6 meses">Sim, tenho pelo menos 6 meses de despesas em aplicações líquidas e seguras</option>
+            <option value="Tenho parcialmente">Tenho parcialmente (menos de 6 meses)</option>
+            <option value="Não tenho, mas estou construindo">Não tenho, mas estou construindo</option>
+            <option value="Não tenho">Não tenho e não considero prioritário no momento</option>
+        </select>
+        <label>Qual percentual do seu patrimônio total está alocado em investimentos financeiros?</label>
+        <select name="percentual">
+            <option value="">Selecione</option>
+            <option value="Menos de 30%">Menos de 30%</option>
+            <option value="Entre 30% e 50%">Entre 30% e 50%</option>
+            <option value="Entre 50% e 70%">Entre 50% e 70%</option>
+            <option value="Mais de 70%">Mais de 70%</option>
+        </select>
+    </template>
+
+    <template id="block2-fields">
+        <label>Qual é o seu principal objetivo com os investimentos?</label>
+        <select name="objetivo">
+            <option value="">Selecione</option>
+            <option value="Preservar patrimônio">Preservar patrimônio e proteger contra inflação</option>
+            <option value="Gerar renda passiva">Gerar renda passiva recorrente</option>
+            <option value="Acumular patrimônio">Acumular patrimônio para aposentadoria</option>
+            <option value="Objetivo específico">Realizar um objetivo específico (compra de imóvel, educação, viagem)</option>
+            <option value="Multiplicar patrimônio">Multiplicar patrimônio com crescimento acelerado</option>
+            <option value="Diversificar">Diversificar e equilibrar segurança com crescimento</option>
+        </select>
+        <label>Quando você pretende usar a maior parte do dinheiro investido?</label>
+        <select name="prazo">
+            <option value="">Selecione</option>
+            <option value="1 a 2 anos">Nos próximos 1 a 2 anos</option>
+            <option value="3 a 5 anos">Entre 3 e 5 anos</option>
+            <option value="5 a 10 anos">Entre 5 e 10 anos</option>
+            <option value="Mais de 10 anos">Mais de 10 anos</option>
+            <option value="Longo prazo">Não tenho prazo definido — invisto para o longo prazo</option>
+        </select>
+        <label>Você depende da rentabilidade dos seus investimentos para pagar despesas do dia a dia?</label>
+        <select name="dependencia">
+            <option value="">Selecione</option>
+            <option value="Sim, dependo">Sim, dependo da rentabilidade mensal/trimestral</option>
+            <option value="Dependo parcialmente">Dependo parcialmente</option>
+            <option value="Não dependo">Não dependo — tenho renda ativa suficiente</option>
+            <option value="Acumulando">Não dependo — estou acumulando patrimônio</option>
+        </select>
+    </template>
+
+    <template id="block3-fields">
+        <label>Há quanto tempo você investe no mercado financeiro?</label>
+        <select name="tempo">
+            <option value="">Selecione</option>
+            <option value="Menos de 1 ano">Menos de 1 ano</option>
+            <option value="1 a 3 anos">Entre 1 e 3 anos</option>
+            <option value="3 a 5 anos">Entre 3 e 5 anos</option>
+            <option value="5 a 10 anos">Entre 5 e 10 anos</option>
+            <option value="Mais de 10 anos">Mais de 10 anos</option>
+        </select>
+        <label>Como você avalia seu nível de conhecimento sobre investimentos?</label>
+        <select name="conhecimento">
+            <option value="">Selecione</option>
+            <option value="Iniciante">Iniciante — ainda estou aprendendo o básico</option>
+            <option value="Intermediário">Intermediário — entendo os principais produtos e conceitos</option>
+            <option value="Avançado">Avançado — acompanho mercado, faço análises e tomo decisões técnicas</option>
+            <option value="Profissional">Profissional — trabalho ou trabalhei no mercado financeiro</option>
+        </select>
+        <label>Quais tipos de investimentos você já possui ou já teve experiência? (múltipla escolha)</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="experiencia[]" value="Poupança"> Poupança</label>
+            <label><input type="checkbox" name="experiencia[]" value="Tesouro Direto"> Tesouro Direto</label>
+            <label><input type="checkbox" name="experiencia[]" value="CDB, LCI, LCA"> CDB, LCI, LCA</label>
+            <label><input type="checkbox" name="experiencia[]" value="Fundos de Renda Fixa"> Fundos de Renda Fixa</label>
+            <label><input type="checkbox" name="experiencia[]" value="Fundos Multimercado"> Fundos Multimercado</label>
+            <label><input type="checkbox" name="experiencia[]" value="Ações"> Ações (compra direta)</label>
+            <label><input type="checkbox" name="experiencia[]" value="Fundos de Ações"> Fundos de Ações (FIAs)</label>
+            <label><input type="checkbox" name="experiencia[]" value="Fundos Imobiliários"> Fundos Imobiliários (FIIs)</label>
+            <label><input type="checkbox" name="experiencia[]" value="ETFs"> ETFs</label>
+            <label><input type="checkbox" name="experiencia[]" value="BDRs"> BDRs</label>
+            <label><input type="checkbox" name="experiencia[]" value="Derivativos"> Derivativos (opções, futuros, termo)</label>
+            <label><input type="checkbox" name="experiencia[]" value="Criptomoedas"> Criptomoedas</label>
+            <label><input type="checkbox" name="experiencia[]" value="Previdência Privada"> Previdência Privada (PGBL/VGBL)</label>
+            <label><input type="checkbox" name="experiencia[]" value="COE"> COE (Certificado de Operações Estruturadas)</label>
+            <label><input type="checkbox" name="experiencia[]" value="Debêntures"> Debêntures</label>
+            <label><input type="checkbox" name="experiencia[]" value="Investimentos internacionais"> Investimentos internacionais</label>
+        </div>
+    </template>
+
+    <template id="block4-fields">
+        <label>Imagine que você investiu R$ 100 mil. Em um mês, por oscilação do mercado, seu portfólio cai para R$ 90 mil (-10%). O que você faria?</label>
+        <select name="reacao">
+            <option value="">Selecione</option>
+            <option value="Resgataria tudo">Resgataria tudo imediatamente — não consigo lidar com perdas</option>
+            <option value="Resgataria parte">Resgataria parte para reduzir exposição</option>
+            <option value="Manteria">Manteria a posição e esperaria a recuperação</option>
+            <option value="Aproveitaria">Aproveitaria para comprar mais — vejo como oportunidade</option>
+            <option value="Analisaria">Analisaria friamente a causa antes de decidir</option>
+        </select>
+        <label>Qual é o nível máximo de oscilação (volatilidade) que você tolera em um ano nos seus investimentos?</label>
+        <select name="volatilidade">
+            <option value="">Selecione</option>
+            <option value="Não aceito">Não aceito perdas — prefiro estabilidade total</option>
+            <option value="Até -5%">Até -5% de oscilação</option>
+            <option value="Entre -5% e -15%">Entre -5% e -15%</option>
+            <option value="Entre -15% e -30%">Entre -15% e -30%</option>
+            <option value="Acima de -30%">Acima de -30% — aceito alta volatilidade em troca de maior potencial</option>
+        </select>
+        <label>Como você se sente em relação a investimentos em renda variável (ações, FIIs, etc.)?</label>
+        <select name="renda_variavel">
+            <option value="">Selecione</option>
+            <option value="Tenho medo">Tenho medo e evito — prefiro segurança</option>
+            <option value="Tenho receio">Tenho receio, mas estou disposto a aprender e começar aos poucos</option>
+            <option value="Confortável moderada">Me sinto confortável com uma exposição moderada</option>
+            <option value="Confortável significativa">Me sinto confortável com uma exposição significativa</option>
+            <option value="Essencial">Acredito que renda variável é essencial para multiplicar patrimônio</option>
+        </select>
+        <label>Você já teve alguma experiência de perda relevante em investimentos?</label>
+        <select name="perda">
+            <option value="">Selecione</option>
+            <option value="Sim, afetou muito">Sim, e me afetou muito — mudei completamente minha forma de investir</option>
+            <option value="Sim, aprendizado">Sim, mas consegui absorver como aprendizado</option>
+            <option value="Sim, não mudou">Sim, mas não mudou minha estratégia de longo prazo</option>
+            <option value="Não tive">Não tive perdas significativas ainda</option>
+            <option value="Não invisto">Não invisto em ativos com risco de perda no curto prazo</option>
+        </select>
+    </template>
+
+    <template id="block5-fields">
+        <label>Com que frequência você acompanha seus investimentos?</label>
+        <select name="frequencia">
+            <option value="">Selecione</option>
+            <option value="Diariamente">Diariamente</option>
+            <option value="Semanalmente">Semanalmente</option>
+            <option value="Mensalmente">Mensalmente</option>
+            <option value="Trimestralmente">Trimestralmente</option>
+            <option value="Raramente">Raramente — prefiro investir e esquecer</option>
+        </select>
+        <label>Como você toma decisões de investimento atualmente?</label>
+        <select name="decisoes">
+            <option value="">Selecione</option>
+            <option value="Assessor">Sigo recomendações do meu assessor/gerente</option>
+            <option value="Própria">Analiso por conta própria, usando notícias e relatórios</option>
+            <option value="Combino">Combino análise própria com consultoria externa</option>
+            <option value="Influenciadores">Sigo influenciadores, comunidades e redes sociais</option>
+            <option value="Ferramentas">Uso ferramentas de análise técnica e fundamentalista</option>
+            <option value="Aprendendo">Ainda estou aprendendo e testando diferentes abordagens</option>
+        </select>
+        <label>Você já recebeu alguma recomendação de investimento que não fez sentido para você ou que sentiu ser enviesada?</label>
+        <select name="recomendacao">
+            <option value="">Selecione</option>
+            <option value="Sim, várias">Sim, várias vezes</option>
+            <option value="Sim, algumas">Sim, algumas vezes</option>
+            <option value="Raramente">Raramente</option>
+            <option value="Nunca">Nunca — confio nas recomendações que recebo</option>
+            <option value="Não recebo">Não recebo recomendações externas</option>
+        </select>
+        <label>O que você mais valoriza em uma análise de investimento? (múltipla escolha)</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="valoriza[]" value="Clareza"> Clareza e objetividade</label>
+            <label><input type="checkbox" name="valoriza[]" value="Profundidade"> Profundidade técnica</label>
+            <label><input type="checkbox" name="valoriza[]" value="Comparação"> Comparação entre alternativas</label>
+            <label><input type="checkbox" name="valoriza[]" value="Riscos"> Identificação de riscos</label>
+            <label><input type="checkbox" name="valoriza[]" value="Objetivos"> Alinhamento com meus objetivos</label>
+            <label><input type="checkbox" name="valoriza[]" value="Imparcialidade"> Imparcialidade (sem interesse comercial)</label>
+        </div>
+    </template>
+
+    <template id="block6-fields">
+        <label>Você possui alguma restrição ou preferência específica para seus investimentos? (múltipla escolha)</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="restricoes[]" value="ESG"> Prefiro investimentos ESG (ambientais, sociais e de governança)</label>
+            <label><input type="checkbox" name="restricoes[]" value="Evito setores"> Evito setores específicos (armas, tabaco, álcool, etc.)</label>
+            <label><input type="checkbox" name="restricoes[]" value="Brasileiras"> Priorizo empresas brasileiras</label>
+            <label><input type="checkbox" name="restricoes[]" value="Liquidez"> Priorizo liquidez (poder resgatar rapidamente)</label>
+            <label><input type="checkbox" name="restricoes[]" value="Evito IR"> Evito produtos com IR na fonte</label>
+            <label><input type="checkbox" name="restricoes[]" value="Benefício fiscal"> Prefiro produtos com benefício fiscal (previdência, incentivados)</label>
+            <label><input type="checkbox" name="restricoes[]" value="Nenhuma"> Nenhuma restrição específica</label>
+        </div>
+        <label>Qual frase descreve melhor sua filosofia de investimento?</label>
+        <select name="filosofia">
+            <option value="">Selecione</option>
+            <option value="Segurança">"Prefiro segurança e previsibilidade — não quero surpresas"</option>
+            <option value="Equilíbrio">"Aceito algum risco, mas quero equilíbrio entre segurança e crescimento"</option>
+            <option value="Riscos calculados">"Estou disposto a correr riscos calculados para multiplicar meu patrimônio"</option>
+            <option value="Agressiva">"Invisto de forma agressiva — sei que volatilidade faz parte do jogo"</option>
+            <option value="Descobrindo">"Ainda estou descobrindo minha filosofia"</option>
+        </select>
+    </template>
+
+    <template id="block7-fields">
+        <label>Há algo mais que você gostaria que o Merfin soubesse sobre você, seus objetivos ou suas preocupações com investimentos?</label>
+        <textarea name="contexto_qualitativo" placeholder="Campo opcional - escreva aqui..."></textarea>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>

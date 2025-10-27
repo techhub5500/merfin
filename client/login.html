@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login e Cadastro</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-side">
+            <div class="promo-text">
+                <p>Cadastre-se e tenha 5 dias de teste grátis, sem precisar colocar dados bancários!</p>
+            </div>
+            <div id="login-form-container">
+                <h2>Login - </h2>
+                <form id="login-form">
+                    <input type="text" id="login-identifier" placeholder="Nome ou E-mail" required>
+                    <input type="password" id="login-password" placeholder="Senha" required>
+                    <button type="submit">Entrar</button>
+                </form>
+                <p>Não tem conta? <button id="show-register">Cadastrar-se</button></p>
+            </div>
+            <div id="register-form-container" style="display: none;">
+                <h2>Cadastro</h2>
+                <form id="register-form">
+                    <input type="text" id="register-name" placeholder="Nome" required>
+                    <input type="email" id="register-email" placeholder="Email" required>
+                    <input type="password" id="register-password" placeholder="Senha" required>
+                    <input type="text" id="register-cpf" placeholder="CPF (apenas números)" required>
+                    <input type="tel" id="register-telefone" placeholder="Telefone (ex.: (11) 99999-9999)" required>
+                    <button type="submit">Cadastrar</button>
+                </form>
+                <p>Já tem conta? <button id="show-login">Fazer Login</button></p>
+            </div>
+        </div>
+        <div class="right-side">
+            <img src="login.png" alt="Logo">
+        </div>
+    </div>
+
+    <!-- Modal de notificação -->
+    <div id="notification-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Notificação</h3>
+            <div id="modal-messages"></div>
+            <button id="support-button">Contato Suporte</button>
+            <button id="close-modal">Fechar</button>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
