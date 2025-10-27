@@ -1,5 +1,5 @@
 // ========== VARIÁVEIS GLOBAIS ==========
-const API_BASE = window.API_BASE || 'http://localhost:3001';  // Em produção, defina window.API_BASE no HTML
+const API_BASE = window.API_BASE;
 
 document.getElementById('show-register').addEventListener('click', function() {
     document.getElementById('login-form-container').style.display = 'none';
