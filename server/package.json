@@ -1,6 +1,7 @@
 {
   "name": "merfin-finance",
   "version": "1.0.0",
+  "type": "module", 
   "description": "Servidor para aplicação Merfin",
   "main": "server.js",
   "scripts": {
