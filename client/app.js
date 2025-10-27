@@ -656,22 +656,22 @@ if (exitBtn) {
                                 </button>
                             `;
                             li.addEventListener('click', function(e) {
-                                if (e.target.closest('.delete-chat-btn')) return;
-                                fetch(`${API_URL}/chat/${chat.id}`)
-                                    .then(response => response.json())
-                                    .then(chatData => {
-                                        if (chatData.messages) {
-                                            loadChat(chatData.messages, chat.id);
-                                            historyPanel.style.display = 'none';
-                                        } else {
-                                            alert('Erro ao carregar chat');
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Erro ao carregar chat:', error);
-                                        alert('Erro ao carregar chat');
-                                    });
-                            });
+    if (e.target.closest('.delete-chat-btn')) return;
+    fetch(`${API_URL}/chat/${chat.id}`, { credentials: 'include' }) // ✅ ADICIONAR
+        .then(response => response.json())
+        .then(chatData => {
+            if (chatData.messages) {
+                loadChat(chatData.messages, chat.id);
+                historyPanel.style.display = 'none';
+            } else {
+                alert('Erro ao carregar chat');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar chat:', error);
+            alert('Erro ao carregar chat');
+        });
+});
                             historyList.appendChild(li);
                         });
                     }
