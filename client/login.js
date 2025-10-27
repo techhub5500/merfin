@@ -1,16 +1,22 @@
-// ==========================================
-// CONFIGURAÇÃO DE AMBIENTE
-// ==========================================
+// ========== CONFIGURAÇÃO DE AMBIENTE ==========
 const getApiUrl = () => {
     // Se estiver em produção (Render)
     if (window.location.hostname === 'merfin-home.onrender.com') {
-        return 'https://merfin-server.onrender.com'; // ✅ CORRIGIDO
+        return 'https://merfin-server.onrender.com'; // ✅ Auth, chat, perfil
     }
-    // Se estiver em desenvolvimento local
-    return 'http://localhost:3000'; // Porta do servidor principal
+    return 'http://localhost:3000';
 };
 
-const API_URL = getApiUrl();
+const getDataApiUrl = () => {
+    // Se estiver em produção (Render)
+    if (window.location.hostname === 'merfin-home.onrender.com') {
+        return 'https://merfin-dado.onrender.com'; // ✅ Company data
+    }
+    return 'http://localhost:3001';
+};
+
+const API_URL = getApiUrl(); // Auth, chat, perfil, newsletter
+const DATA_API_URL = getDataApiUrl(); // Company data
 
 // ==========================================
 // EVENT LISTENERS
