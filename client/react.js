@@ -47,11 +47,12 @@ const MiniChatModal = ({ category, companyIndices, onClose }) => {  // Mudança:
         };
 
         try {
-            const response = await fetch(`${API_URL}/chat`, {  // MUDANÇA: adiciona API_URL
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, context })
-});
+    const response = await fetch(`${API_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // ✅ ADICIONAR
+        body: JSON.stringify({ message, context })
+    });
             const data = await response.json();
             if (data.response) {
                 setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
