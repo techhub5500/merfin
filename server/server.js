@@ -129,12 +129,12 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
-        maxAge: 24 * 60 * 60 * 1000
-    }
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // ❌ COMENTAR ESTA LINHA
+    maxAge: 24 * 60 * 60 * 1000
+}
 }));
 
 // ✅ MIDDLEWARE DE DEBUG (ADICIONAR)
@@ -817,30 +817,18 @@ app.post('/login', async (req, res) => {
             
             // salvar sessão antes de responder
             req.session.save((err) => {
-                if (err) {
-                    console.error('[LOGIN] ❌ Erro ao salvar sessão:', err);
-                    logger.error('Erro ao salvar sessão:', err);
-                    return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
-                }
-                
-                console.log('[LOGIN] ✅ Sessão salva com sucesso');
-                console.log('[LOGIN] Session ID:', req.sessionID);
-                console.log('[LOGIN] Session Cookie Config:', req.session.cookie);
-                console.log('[LOGIN] Response Headers que serão enviados:');
-                
-                // Forçar envio do Set-Cookie
-                res.set('Set-Cookie', `connect.sid=${req.sessionID}; Path=/; HttpOnly; ${req.session.cookie.secure ? 'Secure;' : ''} SameSite=${req.session.cookie.sameSite}; ${req.session.cookie.domain ? `Domain=${req.session.cookie.domain};` : ''} Max-Age=${req.session.cookie.maxAge / 1000}`);
-                
-                return res.json({ success: true });
-            });
-        } else {
-            console.log('[LOGIN] ❌ Credenciais inválidas');
-            return res.json({ success: false, message: 'Credenciais inválidas' });
-        }
-    } catch (error) {
-        console.error('[LOGIN] ❌ Erro no catch:', error);
-        return res.json({ success: false, message: error.message });
+    if (err) {
+        console.error('[LOGIN] ❌ Erro ao salvar sessão:', err);
+        logger.error('Erro ao salvar sessão:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
     }
+    
+    console.log('[LOGIN] ✅ Sessão salva com sucesso');
+    console.log('[LOGIN] Session ID:', req.sessionID);
+    console.log('[LOGIN] Session Cookie Config:', req.session.cookie);
+    console.log('[LOGIN] Response Headers que serão enviados:');
+        
+    return res.json({ success: true }); // ✅ MANTER ESTE return
 });
 
 // Rota para logout
