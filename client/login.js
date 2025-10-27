@@ -51,25 +51,38 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     const identifier = document.getElementById('login-identifier').value;
     const password = document.getElementById('login-password').value;
 
-    fetch(`${API_URL}/login`, {  // ✅ ADICIONAR API_URL
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, password })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = '/';
+    fetch(`${API_URL}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include', // ✅ ADICIONAR para enviar cookies
+    body: JSON.stringify({ identifier, password })
+})
+.then(response => {
+    // ✅ ADICIONAR: Verificar se resposta é JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Resposta do servidor não é JSON. Verifique logs no backend.');
+    }
+    return response.json();
+})
+.then(data => {
+    if (data.success) {
+        window.location.href = '/';
+    } else {
+        // Mostra modal em vez de alert
+        if (Array.isArray(data.messages)) {
+            showNotificationModal(data.messages);
         } else {
-            // Mostra modal em vez de alert
-            if (Array.isArray(data.messages)) {
-                showNotificationModal(data.messages);
-            } else {
-                showNotificationModal([data.message || 'Erro desconhecido']);
-            }
+            showNotificationModal([data.message || 'Erro desconhecido']);
         }
-    })
-    .catch(error => console.error('Erro:', error));
+    }
+})
+.catch(error => {
+    console.error('Erro:', error);
+    alert('Erro de conexão: ' + error.message); // ✅ Mostrar erro específico
+
+});
+
 });
 
 // ==========================================
