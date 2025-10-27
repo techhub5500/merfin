@@ -12,10 +12,17 @@ import multer from 'multer';
 import fs from 'fs';
 import axios from 'axios';
 import cron from 'node-cron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import cors from 'cors'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const NEWS_SITES = ['infomoney.com.br', 'valor.com.br', 'bloomberg.com', 'wsj.com', 'ft.com'];
 
 // Logging com Winston
@@ -30,7 +37,9 @@ const logger = winston.createLogger({
 
 const upload = multer({ dest: 'uploads/' });
 
-app.use(express.static('../client'));
+app.use(cors());
+
+app.use(express.static(path.join(__dirname, '../client')));
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {

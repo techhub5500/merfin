@@ -1,6 +1,26 @@
-// ========== VARIÁVEIS GLOBAIS ==========
-const API_BASE = window.API_BASE;  // Em produção, defina window.API_BASE no HTML
+// ========== CONFIGURAÇÃO DE AMBIENTE ==========
+const getApiUrl = () => {
+    // Se estiver em produção (Render)
+    if (window.location.hostname === 'merfin-home.onrender.com') {
+        return 'https://merfin-home.onrender.com';
+    }
+    // Servidor principal (auth, chat, perfil)
+    return 'http://localhost:3000';
+};
 
+const getDataApiUrl = () => {
+    // Se estiver em produção (Render)
+    if (window.location.hostname === 'merfin-home.onrender.com') {
+        return 'https://merfin-home.onrender.com'; // Ambos na mesma URL em produção
+    }
+    // Servidor de dados (company-cards, indicators)
+    return 'http://localhost:3001';
+};
+
+const API_URL = getApiUrl(); // Auth, chat, perfil, newsletter
+const DATA_API_URL = getDataApiUrl(); // Company data
+
+// ========== VARIÁVEIS GLOBAIS ==========
 let isSearching = false;
 let cardUpdateInterval;
 let currentChatId = null;
@@ -78,7 +98,7 @@ function renderSuggestionsCarousel() {
 async function updateCompanyCards() {
     const tickers = getRandomTickers().join(',');
     try {
-        const response = await fetch(`${API_BASE}/api/company-cards?tickers=${tickers}`);  // Mudança: use API_BASE
+        const response = await fetch(`${DATA_API_URL}/api/company-cards?tickers=${tickers}`); // ✅ USAR DATA_API_URL
         if (!response.ok) throw new Error('Erro na busca');
         const companies = await response.json();
         
@@ -116,7 +136,7 @@ window.resumeCardUpdates = resumeCardUpdates;
 // ========== FUNÇÕES DE BUSCA ==========
 async function fetchCompanyIndicators(ticker) {
     try {
-        const response = await fetch(`${API_BASE}/api/company-indicators/${ticker}`);  // Mudança: use API_BASE
+        const response = await fetch(`${DATA_API_URL}/api/company-indicators/${ticker}`); // ✅ USAR DATA_API_URL
         if (!response.ok) throw new Error('Erro na busca');
         return await response.json();
     } catch (error) {
@@ -127,7 +147,7 @@ async function fetchCompanyIndicators(ticker) {
 
 async function fetchCompanyIndicatorsByName(name) {
     try {
-        const response = await fetch(`${API_BASE}/api/company-indicators-by-name?name=${encodeURIComponent(name)}`);  // Mudança: use API_BASE
+        const response = await fetch(`${DATA_API_URL}/api/company-indicators-by-name?name=${encodeURIComponent(name)}`); // ✅ USAR DATA_API_URL
         if (!response.ok) throw new Error('Erro na busca');
         return await response.json();
     } catch (error) {
@@ -139,7 +159,7 @@ async function fetchCompanyIndicatorsByName(name) {
 // ========== FUNÇÕES DE PERFIL ==========
 async function loadProfile() {
     try {
-        const response = await fetch(`${API_BASE}/load-profile`);  // Mudança: use API_BASE
+        const response = await fetch(`${API_URL}/load-profile`);
         if (response.ok) {
             const data = await response.json();
             userProfile = data.profileData || {};
@@ -155,7 +175,7 @@ async function loadProfile() {
 
 async function saveProfile() {
     try {
-        const response = await fetch(`${API_BASE}/save-profile`, {  // Mudança: use API_BASE
+        const response = await fetch(`${API_URL}/save-profile`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ profileData: userProfile })
@@ -443,7 +463,7 @@ window.researchCompany = async function(ticker) {
 // ========== EVENT LISTENERS ==========
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar se o usuário está logado
-    fetch(`${API_BASE}/check-login`)  // Mudança: use API_BASE
+    fetch(`${API_URL}/check-login`)
         .then(response => response.json())
         .then(data => {
             if (!data.loggedIn) {
@@ -486,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingOverlay.style.display = 'flex';
             loadingText.textContent = 'Carregando newsletter do dia...';
 
-            fetch(`${API_BASE}/newsletter`)  // Mudança: use API_BASE
+            fetch(`${API_URL}/newsletter`)
                 .then(response => response.json())
                 .then(data => {
                     // Esconder loading
@@ -574,28 +594,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ========== BOTÃO DE SAIR ==========
     const exitBtn = document.getElementById('exit-btn');
-    if (exitBtn) {
-        exitBtn.addEventListener('click', function() {
-            fetch(`${API_BASE}/logout`, {  // Mudança: use API_BASE
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/login.html';
-                } else {
-                    alert('Erro ao sair');
-                }
-            })
-            .catch(error => console.error('Erro:', error));
-        });
-    }
+if (exitBtn) {
+    exitBtn.addEventListener('click', function() {
+        fetch(`${API_URL}/logout`, {  // ✅ ADICIONAR API_URL
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/login.html';
+            } else {
+                alert('Erro ao sair');
+            }
+        })
+        .catch(error => console.error('Erro:', error));
+    });
+}
 
     // ========== NOVO CHAT ==========
     const newChatBtn = document.getElementById('new-chat-btn');
     if (newChatBtn) {
         newChatBtn.addEventListener('click', function() {
-            fetch(`${API_BASE}/new-chat`, {  // Mudança: use API_BASE
+            fetch(`${API_URL}/new-chat`, {
                 method: 'POST'
             })
             .then(response => response.json())
@@ -628,8 +648,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (historyBtn && historyPanel) {
         historyBtn.addEventListener('click', function() {
             historyPanel.style.display = 'flex';
-            fetch(`${API_BASE}/history`)  // Mudança: use API_BASE
-                .then(response => response.json())
+        fetch(`${API_URL}/history`)  
+            .then(response => response.json())
                 .then(data => {
                     chatsData = data;
                     historyList.innerHTML = '';
@@ -647,7 +667,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             `;
                             li.addEventListener('click', function(e) {
                                 if (e.target.closest('.delete-chat-btn')) return;
-                                fetch(`${API_BASE}/chat/${chat.id}`)  // Mudança: use API_BASE
+                                fetch(`${API_URL}/chat/${chat.id}`)
                                     .then(response => response.json())
                                     .then(chatData => {
                                         if (chatData.messages) {
@@ -678,7 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const btn = e.target.closest('.delete-chat-btn');
             const chatId = btn.dataset.chatId;
             if (confirm('Tem certeza que deseja deletar este chat?')) {
-                fetch(`${API_BASE}/chat/${chatId}`, {  // Mudança: use API_BASE
+                fetch(`${API_URL}/chat/${chatId}`, {
                     method: 'DELETE'
                 })
                 .then(response => response.json())
@@ -704,27 +724,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (deleteAllHistoryBtn) {
-        deleteAllHistoryBtn.addEventListener('click', function() {
-            if (confirm('Tem certeza que deseja apagar todo o histórico?')) {
-                fetch(`${API_BASE}/history`, {  // Mudança: use API_BASE
-                    method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        historyList.innerHTML = '<li>Nenhum histórico disponível.</li>';
-                        alert('Histórico apagado com sucesso');
-                    } else {
-                        alert('Erro ao apagar histórico');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao apagar histórico:', error);
+    deleteAllHistoryBtn.addEventListener('click', function() {
+        if (confirm('Tem certeza que deseja apagar todo o histórico?')) {
+            fetch(`${API_URL}/history`, {  // ✅ ADICIONAR API_URL
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    historyList.innerHTML = '<li>Nenhum histórico disponível.</li>';
+                    alert('Histórico apagado com sucesso');
+                } else {
                     alert('Erro ao apagar histórico');
-                });
-            }
-        });
-    }
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao apagar histórico:', error);
+                alert('Erro ao apagar histórico');
+            });
+        }
+    });
+}
 
     if (historySearch && historyList) {
         historySearch.addEventListener('input', function() {
@@ -913,7 +933,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!currentChatId) {
                     console.log('Nenhum chat ativo, criando novo...');
                     try {
-                        const newChatResponse = await fetch(`${API_BASE}/new-chat`, { method: 'POST' });  // Mudança: use API_BASE
+                        const newChatResponse = await fetch(`${API_URL}/new-chat`, { method: 'POST' });
                         const newChatData = await newChatResponse.json();
                         if (newChatData.chatId) {
                             currentChatId = newChatData.chatId;
@@ -941,7 +961,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         formData.append('files', file);
                     });
 
-                    const response = await fetch(`${API_BASE}/chat`, {  // Mudança: use API_BASE
+                    const response = await fetch(`${API_URL}/chat`, {
                         method: 'POST',
                         body: formData,
                     });

@@ -2727,3 +2727,36 @@
 {"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
 {"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
 {"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Servidor rodando na porta 3000"}
+{"level":"info","message":"Conectado ao MongoDB"}
+{"level":"info","message":"Novo chat criado para usuário 68ef174c07c2f5c2c0938939"}
+{"level":"info","message":"Plano gerado: {\"raciocinio\":\"Usuário iniciou conversa com saudação básica. Como é primeiro contato e não há contexto específico, preciso coletar informações sobre objetivos de investimento e tolerância a risco para oferecer análise relevante considerando seu perfil patrimonial e restrições brasileiras.\",\"necessita_dados\":true,\"tipo_dados\":\"financeiro\",\"empresa\":null,\"metricas_essenciais\":null,\"periodo_especifico\":null,\"profundidade_tecnica\":\"intermediario\",\"tipo_resposta\":\"explicacao_conceitual\",\"convicção_necessaria\":false}"}
+{"level":"info","message":"[PLAN] {\"raciocinio\":\"Usuário iniciou conversa com saudação básica. Como é primeiro contato e não há contexto específico, preciso coletar informações sobre objetivos de investimento e tolerância a risco para oferecer análise relevante considerando seu perfil patrimonial e restrições brasileiras.\",\"necessita_dados\":true,\"tipo_dados\":\"financeiro\",\"empresa\":null,\"metricas_essenciais\":null,\"periodo_especifico\":null,\"profundidade_tecnica\":\"intermediario\",\"tipo_resposta\":\"explicacao_conceitual\",\"convicção_necessaria\":false}"}
+{"level":"info","message":"Mensagem processada para usuário 68ef174c07c2f5c2c0938939"}
+{"level":"info","message":"Plano gerado: {\"raciocinio\":\"Usuário solicita análise específica da Petrobras, empresa brasileira de grande capitalização. Como investidor intermediário com patrimônio relevante, ele precisa de análise técnica aprofundada que considere seu perfil sofisticado e restrições brasileiras. A Petrobras é adequada para seu perfil dado o tamanho e liquidez.\",\"necessita_dados\":true,\"tipo_dados\":\"financeiro\",\"empresa\":\"Petrobras\",\"metricas_essenciais\":[\"ROE\",\"P/L\",\"EV/EBITDA\",\"Dividend Yield\",\"Margem Líquida\"],\"periodo_especifico\":null,\"profundidade_tecnica\":\"intermediario\",\"tipo_resposta\":\"analise_completa\",\"convicção_necessaria\":true}"}
+{"level":"info","message":"[PLAN] {\"raciocinio\":\"Usuário solicita análise específica da Petrobras, empresa brasileira de grande capitalização. Como investidor intermediário com patrimônio relevante, ele precisa de análise técnica aprofundada que considere seu perfil sofisticado e restrições brasileiras. A Petrobras é adequada para seu perfil dado o tamanho e liquidez.\",\"necessita_dados\":true,\"tipo_dados\":\"financeiro\",\"empresa\":\"Petrobras\",\"metricas_essenciais\":[\"ROE\",\"P/L\",\"EV/EBITDA\",\"Dividend Yield\",\"Margem Líquida\"],\"periodo_especifico\":null,\"profundidade_tecnica\":\"intermediario\",\"tipo_resposta\":\"analise_completa\",\"convicção_necessaria\":true}"}
+{"level":"info","message":"Mensagem processada para usuário 68ef174c07c2f5c2c0938939"}
+{"level":"info","message":"Servidor rodando na porta 3000"}
+{"level":"info","message":"Conectado ao MongoDB"}
+{"level":"info","message":"Novo chat criado para usuário 68ef174c07c2f5c2c0938939"}
+{"level":"info","message":"Plano gerado: {\"raciocinio\":\"O usuário iniciou com uma saudação básica ('oi'), indicando que esta é uma conversa inicial. Como é o primeiro turno e não há contexto específico sobre empresas ou análises solicitadas, o foco deve ser estabelecer o diálogo e entender melhor as necessidades do investidor.\",\"necessita_dados\":false,\"tipo_dados\":\"nenhum\",\"empresa\":null,\"metricas_essenciais\":null,\"periodo_especifico\":null,\"profundidade_tecnica\":\"iniciante\",\"tipo_resposta\":\"resposta_rapida\",\"convicção_necessaria\":false}"}
+{"level":"info","message":"[PLAN] {\"raciocinio\":\"O usuário iniciou com uma saudação básica ('oi'), indicando que esta é uma conversa inicial. Como é o primeiro turno e não há contexto específico sobre empresas ou análises solicitadas, o foco deve ser estabelecer o diálogo e entender melhor as necessidades do investidor.\",\"necessita_dados\":false,\"tipo_dados\":\"nenhum\",\"empresa\":null,\"metricas_essenciais\":null,\"periodo_especifico\":null,\"profundidade_tecnica\":\"iniciante\",\"tipo_resposta\":\"resposta_rapida\",\"convicção_necessaria\":false}"}
+{"level":"info","message":"Mensagem processada para usuário 68ef174c07c2f5c2c0938939"}
+{"level":"info","message":"Servidor rodando na porta 3000"}
+{"level":"info","message":"Conectado ao MongoDB"}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 1 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Servidor rodando na porta 3000"}
+{"level":"info","message":"Conectado ao MongoDB"}
+{"level":"info","message":"Novo chat criado para usuário 68ef174c07c2f5c2c0938939"}
+{"level":"info","message":"Plano gerado: {\"raciocinio\":\"O usuário está perguntando sobre o que sei dele em seu primeiro contato. Como é o primeiro turno e tenho apenas informações básicas do perfil (patrimônio, aportes, conhecimento intermediário), devo confirmar essas informações e solicitar dados mais específicos para personalizar melhor as análises futuras.\",\"necessita_dados\":true,\"tipo_dados\":\"financeiro\",\"empresa\":null,\"metricas_essenciais\":null,\"periodo_especifico\":null,\"profundidade_tecnica\":\"intermediario\",\"tipo_resposta\":\"explicacao_conceitual\",\"convicção_necessaria\":false}"}
+{"level":"info","message":"[PLAN] {\"raciocinio\":\"O usuário está perguntando sobre o que sei dele em seu primeiro contato. Como é o primeiro turno e tenho apenas informações básicas do perfil (patrimônio, aportes, conhecimento intermediário), devo confirmar essas informações e solicitar dados mais específicos para personalizar melhor as análises futuras.\",\"necessita_dados\":true,\"tipo_dados\":\"financeiro\",\"empresa\":null,\"metricas_essenciais\":null,\"periodo_especifico\":null,\"profundidade_tecnica\":\"intermediario\",\"tipo_resposta\":\"explicacao_conceitual\",\"convicção_necessaria\":false}"}
+{"level":"info","message":"Mensagem processada para usuário 68ef174c07c2f5c2c0938939"}

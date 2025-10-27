@@ -1,12 +1,22 @@
 // ==========================================
 // REACT MESSAGE RENDERER - STANDALONE
 // ==========================================
-const API_BASE = window.API_BASE;
 
 (function() {
     'use strict';
 
     const { useState, useEffect, useRef } = React;
+
+    const getApiUrl = () => {
+    // Se estiver em produção (Render)
+    if (window.location.hostname === 'merfin-home.onrender.com') {
+        return 'https://merfin-home.onrender.com';
+    }
+    // Se estiver em desenvolvimento local
+    return 'http://localhost:3000'; // ou a porta que você usa
+};
+
+const API_URL = getApiUrl();
 
     // ==========================================
 // COMPONENTE: MiniChatModal
@@ -37,11 +47,11 @@ const MiniChatModal = ({ category, companyIndices, onClose }) => {  // Mudança:
         };
 
         try {
-            const response = await fetch(`${API_BASE}/chat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message, context })
-            });
+            const response = await fetch(`${API_URL}/chat`, {  // MUDANÇA: adiciona API_URL
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, context })
+});
             const data = await response.json();
             if (data.response) {
                 setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);

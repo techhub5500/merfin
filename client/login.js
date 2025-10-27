@@ -1,6 +1,20 @@
-// ========== VARIÁVEIS GLOBAIS ==========
-const API_BASE = window.API_BASE;
+// ==========================================
+// CONFIGURAÇÃO DE AMBIENTE
+// ==========================================
+const getApiUrl = () => {
+    // Se estiver em produção (Render)
+    if (window.location.hostname === 'merfin-home.onrender.com') {
+        return 'https://merfin-home.onrender.com';
+    }
+    // Se estiver em desenvolvimento local
+    return 'http://localhost:3000'; // Porta da API
+};
 
+const API_URL = getApiUrl();
+
+// ==========================================
+// EVENT LISTENERS
+// ==========================================
 document.getElementById('show-register').addEventListener('click', function() {
     document.getElementById('login-form-container').style.display = 'none';
     document.getElementById('register-form-container').style.display = 'block';
@@ -29,12 +43,15 @@ document.getElementById('support-button').addEventListener('click', function() {
     window.open('https://wa.link/37wkdq', '_blank');
 });
 
+// ==========================================
+// FORMULÁRIO DE LOGIN
+// ==========================================
 document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const identifier = document.getElementById('login-identifier').value;
     const password = document.getElementById('login-password').value;
 
-    fetch('https://merfin-server.onrender.com/login', {
+    fetch(`${API_URL}/login`, {  // ✅ ADICIONAR API_URL
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, password })
@@ -44,6 +61,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
         if (data.success) {
             window.location.href = '/';
         } else {
+            // Mostra modal em vez de alert
             if (Array.isArray(data.messages)) {
                 showNotificationModal(data.messages);
             } else {
@@ -54,6 +72,9 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     .catch(error => console.error('Erro:', error));
 });
 
+// ==========================================
+// FORMULÁRIO DE REGISTRO
+// ==========================================
 document.getElementById('register-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const name = document.getElementById('register-name').value;
@@ -62,12 +83,13 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
     const cpf = document.getElementById('register-cpf').value;
     const telefone = document.getElementById('register-telefone').value;
 
+    // Validação básica
     if (!cpf || !telefone) {
         alert('CPF e telefone são obrigatórios.');
         return;
     }
 
-    fetch('https://merfin-server.onrender.com/register', {
+    fetch(`${API_URL}/register`, {  // ✅ ADICIONAR API_URL
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, cpf, telefone })

@@ -2,13 +2,18 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
+import helmet from 'helmet';
+
+
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+// Linha 13 (após CORS)
+app.use(helmet());
 
 function categorizeIndicators(indicators) {
     const categories = {
@@ -784,6 +789,4 @@ app.get('/api/company-cards', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor BRAPI rodando na porta ${PORT}`);
-});
+app.listen(PORT, () => console.log(`ServerDado rodando na porta ${PORT}`));
