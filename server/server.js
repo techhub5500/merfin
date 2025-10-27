@@ -30,8 +30,9 @@ const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
     transports: [
-        new winston.transports.File({ filename: 'error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'combined.log' }),
+        process.env.NODE_ENV === 'production'
+            ? new winston.transports.Console({ format: winston.format.simple() }) // ✅ Console em produção
+            : new winston.transports.File({ filename: 'combined.log' }) // Arquivo apenas local
     ],
 });
 
@@ -828,7 +829,17 @@ app.post('/login', async (req, res) => {
     console.log('[LOGIN] Session Cookie Config:', req.session.cookie);
     console.log('[LOGIN] Response Headers que serão enviados:');
         
-    return res.json({ success: true }); // ✅ MANTER ESTE return
+    return res.json({ success: true });
+});
+
+        } else { // ✅ ADICIONAR ESTE BLOCO (estava faltando!)
+            console.log('[LOGIN] ❌ Credenciais inválidas');
+            return res.json({ success: false, message: 'Credenciais inválidas' });
+        }
+    } catch (error) {
+        console.error('[LOGIN] ❌ Erro no catch:', error);
+        return res.json({ success: false, message: error.message });
+    }
 });
 
 // Rota para logout
