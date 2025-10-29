@@ -360,11 +360,47 @@ p button:hover {
     margin: 32px 0 24px 0;
 }
 
+/* ✅ BOTÃO WHATSAPP */
+.mobile-warning-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366; /* Cor oficial do WhatsApp */
+    color: #ffffff;
+    padding: 14px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 24px 0;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.mobile-warning-button:hover {
+    background: #20BA5A;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+}
+
+.mobile-warning-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+.mobile-warning-button svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
 .mobile-warning-footer {
     color: #a0a0a0 !important; /* var(--color-text-secondary) */
     font-size: 13px !important;
     font-style: italic;
-    margin: 0 !important;
+    margin: 16px 0 0 0 !important;
 }
 
 /* Responsividade */
@@ -384,5 +420,12 @@ p button:hover {
 
     .mobile-warning-content p {
         font-size: 14px;
+    }
+
+    .mobile-warning-button {
+        padding: 12px 24px;
+        font-size: 14px;
+        width: 100%;
+        justify-content: center;
     }
 }
