@@ -52,17 +52,38 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
     const password = document.getElementById('login-password').value;
 
     fetch(`${API_URL}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include', // ← importante
-    body: JSON.stringify({ identifier, password })
-})
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ identifier, password })
+    })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = '/';
+            // ✅ ADICIONAR: Aguardar 500ms e VERIFICAR sessão antes de redirecionar
+            console.log('Login bem-sucedido, verificando sessão...');
+            
+            setTimeout(() => {
+                fetch(`${API_URL}/check-login`, {
+                    method: 'GET',
+                    credentials: 'include'
+                })
+                .then(r => r.json())
+                .then(checkData => {
+                    if (checkData.loggedIn) {
+                        console.log('Sessão confirmada, redirecionando...');
+                        window.location.href = '/';
+                    } else {
+                        console.error('Sessão não confirmada após login!');
+                        showNotificationModal(['Erro ao criar sessão. Tente novamente.']);
+                    }
+                })
+                .catch(err => {
+                    console.error('Erro ao verificar sessão:', err);
+                    showNotificationModal(['Erro de conexão. Tente novamente.']);
+                });
+            }, 500); // Aguarda 500ms para sessão salvar no MongoDB
         } else {
-            // Mostra modal em vez de alert
             if (Array.isArray(data.messages)) {
                 showNotificationModal(data.messages);
             } else {
@@ -70,8 +91,12 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
             }
         }
     })
-    .catch(error => console.error('Erro:', error));
+    .catch(error => {
+        console.error('Erro:', error);
+        showNotificationModal(['Erro de conexão. Tente novamente.']);
+    });
 });
+
 
 // ==========================================
 // FORMULÁRIO DE REGISTRO

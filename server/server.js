@@ -126,16 +126,20 @@ app.set('trust proxy', 1);
 // Sessões com MongoDB Store
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your_super_secret_key',
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    store: MongoStore.create({ 
+        mongoUrl: process.env.MONGO_URI,
+        touchAfter: 24 * 3600
+    }),
     resave: false,
     saveUninitialized: false,
     cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // ❌ COMENTAR ESTA LINHA
-    maxAge: 24 * 60 * 60 * 1000
-}
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined // ✅ ADICIONAR: compartilha cookie entre subdomínios
+    },
+    name: 'merfin.sid'
 }));
 
 // ✅ MIDDLEWARE DE DEBUG (ADICIONAR)
@@ -797,7 +801,7 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     console.log('\n🔐 [LOGIN] Tentativa de login iniciada');
     console.log('[LOGIN] Body:', req.body);
-    console.log('[LOGIN] Headers:', req.headers);
+    console.log('[LOGIN] Origin:', req.headers.origin);
     
     try {
         const { identifier, password } = req.body;
@@ -812,27 +816,34 @@ app.post('/login', async (req, res) => {
                 return res.json({ success: false, message });
             }
             
-            req.session.user = user._id;
-            console.log('[LOGIN] ✅ Usuário encontrado:', user.email);
-            console.log('[LOGIN] Session ANTES de salvar:', req.session);
-            
-            // salvar sessão antes de responder
-            req.session.save((err) => {
-    if (err) {
-        console.error('[LOGIN] ❌ Erro ao salvar sessão:', err);
-        logger.error('Erro ao salvar sessão:', err);
-        return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
-    }
-    
-    console.log('[LOGIN] ✅ Sessão salva com sucesso');
-    console.log('[LOGIN] Session ID:', req.sessionID);
-    console.log('[LOGIN] Session Cookie Config:', req.session.cookie);
-    console.log('[LOGIN] Response Headers que serão enviados:');
-        
-    return res.json({ success: true });
-});
+            req.session.regenerate((err) => {
+                if (err) {
+                    console.error('[LOGIN] ❌ Erro ao regenerar sessão:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
+                }
+                
+                req.session.user = user._id;
+                console.log('[LOGIN] ✅ Usuário encontrado:', user.email);
+                console.log('[LOGIN] Session ANTES de salvar:', req.session);
+                
+                req.session.save((err) => {
+                    if (err) {
+                        console.error('[LOGIN] ❌ Erro ao salvar sessão:', err);
+                        return res.status(500).json({ success: false, message: 'Erro ao criar sessão' });
+                    }
+                    
+                    console.log('[LOGIN] ✅ Sessão salva com sucesso');
+                    console.log('[LOGIN] Session ID:', req.sessionID);
+                    console.log('[LOGIN] Cookie será enviado para:', req.session.cookie);
+                    
+                    // ✅ ADICIONAR: Confirmar que cookie será enviado
+                    res.setHeader('Set-Cookie', `merfin.sid=${req.sessionID}; Domain=.onrender.com; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=86400`);
+                    
+                    return res.json({ success: true });
+                });
+            });
 
-        } else { // ✅ ADICIONAR ESTE BLOCO (estava faltando!)
+        } else {
             console.log('[LOGIN] ❌ Credenciais inválidas');
             return res.json({ success: false, message: 'Credenciais inválidas' });
         }
