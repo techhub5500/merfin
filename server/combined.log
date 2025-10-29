@@ -2800,3 +2800,90 @@
 {"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
 {"level":"info","message":"Sessões destruídas: 10 para usuários inativos."}
 {"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 4 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 1 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 1 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Servidor rodando na porta 3000"}
+{"level":"info","message":"Conectado ao MongoDB"}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}
+{"level":"info","message":"Executando verificação de assinaturas..."}
+{"level":"info","message":"Usuários inativos encontrados: 2 (68ef174c07c2f5c2c0938939, 68f83a00abd0ed1511f4233e)"}
+{"level":"info","message":"Regex para deleção: .*\"user\":\"(68ef174c07c2f5c2c0938939|68f83a00abd0ed1511f4233e)\".*"}
+{"level":"info","message":"Sessões destruídas: 0 para usuários inativos."}
+{"level":"info","message":"Usuários ativos restantes: 2 (suas sessões não foram tocadas)."}

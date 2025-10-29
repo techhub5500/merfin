@@ -689,8 +689,9 @@ if (exitBtn) {
             const chatId = btn.dataset.chatId;
             if (confirm('Tem certeza que deseja deletar este chat?')) {
                 fetch(`${API_URL}/chat/${chatId}`, {
-                    method: 'DELETE'
-                })
+    method: 'DELETE',
+    credentials: 'include'  // Adicionar
+})
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -716,9 +717,10 @@ if (exitBtn) {
     if (deleteAllHistoryBtn) {
     deleteAllHistoryBtn.addEventListener('click', function() {
         if (confirm('Tem certeza que deseja apagar todo o histórico?')) {
-            fetch(`${API_URL}/history`, {  // ✅ ADICIONAR API_URL
-                method: 'DELETE'
-            })
+            fetch(`${API_URL}/history`, { 
+    method: 'DELETE',
+    credentials: 'include'  // Adicionar
+})
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
