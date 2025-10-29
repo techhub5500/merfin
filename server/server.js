@@ -136,10 +136,11 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000,
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined // ✅ ADICIONAR: compartilha cookie entre subdomínios
+        maxAge: 24 * 60 * 60 * 1000
+        // ❌ REMOVER: domain: '.onrender.com' (não funciona com Public Suffix)
     },
-    name: 'merfin.sid'
+    name: 'merfin.sid',
+    proxy: true // ✅ ADICIONAR: confiar em proxy reverso
 }));
 
 // ✅ MIDDLEWARE DE DEBUG (ADICIONAR)
@@ -834,10 +835,9 @@ app.post('/login', async (req, res) => {
                     
                     console.log('[LOGIN] ✅ Sessão salva com sucesso');
                     console.log('[LOGIN] Session ID:', req.sessionID);
-                    console.log('[LOGIN] Cookie será enviado para:', req.session.cookie);
+                    console.log('[LOGIN] Cookie será enviado:', req.session.cookie);
                     
-                    // ✅ ADICIONAR: Confirmar que cookie será enviado
-                    res.setHeader('Set-Cookie', `merfin.sid=${req.sessionID}; Domain=.onrender.com; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=86400`);
+                    // ❌ REMOVER: res.setHeader manual (deixa o express-session gerenciar)
                     
                     return res.json({ success: true });
                 });
