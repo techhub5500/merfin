@@ -15,6 +15,7 @@ import cron from 'node-cron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors'
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -643,7 +644,7 @@ const allowAnonymous = (req, res, next) => {
     }
     // Usuário anônimo: gerar ID se não existir
     if (!req.session.anonymousId) {
-        req.session.anonymousId = require('crypto').randomUUID();
+        req.session.anonymousId = crypto.randomUUID();
     }
     // Rastrear tempo de uso diário
     const today = new Date().toISOString().split('T')[0];
