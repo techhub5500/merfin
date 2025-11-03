@@ -1049,24 +1049,37 @@ async function processFile(file) {
 // Rota para novo chat
 app.post('/new-chat', allowAnonymous, async (req, res) => {
     try {
+        console.log('[NEW-CHAT] Iniciando criação de chat');
+        console.log('[NEW-CHAT] Session User:', req.session.user);
+        console.log('[NEW-CHAT] Session Anonymous ID:', req.session.anonymousId);
+        
         let chatId;
         if (req.session.user) {
-            // Usuário logado: criar Chat normal
+            console.log('[NEW-CHAT] Criando chat para usuário logado');
             const chat = new Chat({ user: req.session.user, messages: [] });
             await chat.save();
             chatId = chat._id;
+            console.log('[NEW-CHAT] Chat logado criado:', chatId);
         } else {
-            // Usuário anônimo: criar TempChat
+            console.log('[NEW-CHAT] Criando TempChat para anônimo');
+            if (!req.session.anonymousId) {
+                console.error('[NEW-CHAT] ERRO: anonymousId não encontrado!');
+                return res.status(400).json({ error: 'Sessão anônima inválida' });
+            }
             const tempChat = new TempChat({ anonymousId: req.session.anonymousId, messages: [] });
             await tempChat.save();
             chatId = tempChat._id;
+            console.log('[NEW-CHAT] TempChat criado:', chatId);
         }
+        
         req.session.currentChatId = chatId;
         logger.info(`Novo chat criado para usuário ${req.session.user || 'anônimo'}: ${chatId}`);
         res.json({ chatId });
+        
     } catch (error) {
+        console.error('[NEW-CHAT] ERRO DETALHADO:', error);
         logger.error('Erro ao criar novo chat:', error);
-        res.status(500).json({ error: 'Erro ao criar novo chat' });
+        res.status(500).json({ error: 'Erro ao criar novo chat', details: error.message });
     }
 });
 
