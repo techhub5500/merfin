@@ -15,7 +15,6 @@ import cron from 'node-cron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors'
-import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -109,22 +108,6 @@ const profileSchema = new mongoose.Schema({
 });
 
 const Profile = mongoose.model('Profile', profileSchema);
-
-const tempChatSchema = new mongoose.Schema({
-    anonymousId: { type: String, required: true },  // ID da sessão anônima
-    messages: [{ role: String, content: String, timestamp: { type: Date, default: Date.now } }],
-    createdAt: { type: Date, default: Date.now }
-});
-tempChatSchema.index({ createdAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 }); // TTL 7 dias
-const TempChat = mongoose.model('TempChat', tempChatSchema);
-
-const tempProfileSchema = new mongoose.Schema({
-    anonymousId: { type: String, required: true, unique: true },
-    profileData: { type: Object, default: {} },
-    updatedAt: { type: Date, default: Date.now }
-});
-tempProfileSchema.index({ updatedAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 }); // TTL 7 dias
-const TempProfile = mongoose.model('TempProfile', tempProfileSchema);
 
 app.use(helmet()); // Segurança: headers de proteção
 app.use(express.json({ limit: '10mb' })); // Limite de payload
@@ -638,26 +621,6 @@ const requireLogin = (req, res, next) => {
     }
 };
 
-const allowAnonymous = (req, res, next) => {
-    if (req.session.user) {
-        return next(); // Usuário logado, prosseguir
-    }
-    // Usuário anônimo: gerar ID se não existir
-    if (!req.session.anonymousId) {
-        req.session.anonymousId = crypto.randomUUID();
-    }
-    // Rastrear tempo de uso diário
-    const today = new Date().toISOString().split('T')[0];
-    if (!req.session.dailyUsage || req.session.dailyUsage.date !== today) {
-        req.session.dailyUsage = { date: today, minutesUsed: 0 };
-    }
-    // Verificar limite de 5 minutos
-    if (req.session.dailyUsage.minutesUsed >= 5) {
-        return res.status(403).json({ error: 'Tempo de uso anônimo esgotado. Cadastre-se para continuar.' });
-    }
-    next();
-};
-
 const BRAPI_METRIC_MAP = {
     // Métricas básicas
     "ticker": "symbol",
@@ -798,12 +761,12 @@ function formatMetricValue(metricName, value, periodLabel = null) {
 }
 
 // Rota para servir index.html apenas se logado
-app.get('/', allowAnonymous, (req, res) => {
+app.get('/', requireLogin, (req, res) => {
     res.sendFile(new URL('../client/index.html', import.meta.url).pathname);
 });
 
 // Rota para index.html diretamente
-app.get('/index.html', allowAnonymous, (req, res) => {
+app.get('/index.html', requireLogin, (req, res) => {
     res.sendFile(new URL('../client/index.html', import.meta.url).pathname);
 });
 
@@ -823,16 +786,6 @@ app.get('/check-login', (req, res) => {
     }
 });
 
-app.get('/check-anonymous', (req, res) => {
-    if (req.session.user) {
-        return res.json({ loggedIn: true, anonymous: false });
-    }
-    const today = new Date().toISOString().split('T')[0];
-    const minutesUsed = req.session.dailyUsage?.minutesUsed || 0;
-    const timeLeft = Math.max(0, 5 - minutesUsed);
-    res.json({ loggedIn: false, anonymous: true, timeLeft });
-});
-
 app.post('/register', async (req, res) => {
     try {
         const { name, email, password, cpf, telefone } = req.body;  // Adicionados cpf e telefone
@@ -840,28 +793,6 @@ app.post('/register', async (req, res) => {
         const user = new User({ name, email, password: hashedPassword, cpf, telefone });  // Incluídos cpf e telefone
         await user.save();
         req.session.user = user._id;
-        // Migração de dados temporários
-        if (req.session.anonymousId) {
-            // Migrar TempChat para Chat
-            const tempChats = await TempChat.find({ anonymousId: req.session.anonymousId });
-            for (const tempChat of tempChats) {
-                const newChat = new Chat({ user: user._id, messages: tempChat.messages });
-                await newChat.save();
-            }
-            await TempChat.deleteMany({ anonymousId: req.session.anonymousId });
-
-            // Migrar TempProfile para Profile
-            const tempProfile = await TempProfile.findOne({ anonymousId: req.session.anonymousId });
-            if (tempProfile) {
-                const newProfile = new Profile({ user: user._id, profileData: tempProfile.profileData });
-                await newProfile.save();
-                await TempProfile.deleteOne({ anonymousId: req.session.anonymousId });
-            }
-
-            // Limpar sessão anônima
-            delete req.session.anonymousId;
-            delete req.session.dailyUsage;
-        }
         res.json({ success: true });
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -1048,39 +979,16 @@ async function processFile(file) {
 }
 
 // Rota para novo chat
-app.post('/new-chat', allowAnonymous, async (req, res) => {
+app.post('/new-chat', requireLogin, async (req, res) => {
     try {
-        console.log('[NEW-CHAT] Iniciando criação de chat');
-        console.log('[NEW-CHAT] Session User:', req.session.user);
-        console.log('[NEW-CHAT] Session Anonymous ID:', req.session.anonymousId);
-        
-        let chatId;
-        if (req.session.user) {
-            console.log('[NEW-CHAT] Criando chat para usuário logado');
-            const chat = new Chat({ user: req.session.user, messages: [] });
-            await chat.save();
-            chatId = chat._id;
-            console.log('[NEW-CHAT] Chat logado criado:', chatId);
-        } else {
-            console.log('[NEW-CHAT] Criando TempChat para anônimo');
-            if (!req.session.anonymousId) {
-                console.error('[NEW-CHAT] ERRO: anonymousId não encontrado!');
-                return res.status(400).json({ error: 'Sessão anônima inválida' });
-            }
-            const tempChat = new TempChat({ anonymousId: req.session.anonymousId, messages: [] });
-            await tempChat.save();
-            chatId = tempChat._id;
-            console.log('[NEW-CHAT] TempChat criado:', chatId);
-        }
-        
-        req.session.currentChatId = chatId;
-        logger.info(`Novo chat criado para usuário ${req.session.user || 'anônimo'}: ${chatId}`);
-        res.json({ chatId });
-        
+        const chat = new Chat({ user: req.session.user, messages: [] });
+        await chat.save();
+        req.session.currentChatId = chat._id;
+        logger.info(`Novo chat criado para usuário ${req.session.user}`);
+        res.json({ chatId: chat._id });
     } catch (error) {
-        console.error('[NEW-CHAT] ERRO DETALHADO:', error);
         logger.error('Erro ao criar novo chat:', error);
-        res.status(500).json({ error: 'Erro ao criar novo chat', details: error.message });
+        res.status(500).json({ error: 'Erro ao criar novo chat' });
     }
 });
 
@@ -1377,30 +1285,19 @@ app.post('/newsletter/regenerate', requireLogin, async (req, res) => {
 
 
 // Rota para chat com IA (atualizada para DeepSeek e pesquisa na internet)
-app.post('/chat', allowAnonymous, upload.array('files'), async (req, res) => {
+app.post('/chat', requireLogin, upload.array('files'), async (req, res) => {
     try {
         let chatId = req.session.currentChatId;
         if (!chatId) {
-            if (req.session.user) {
-                const chat = new Chat({ user: req.session.user, messages: [] });
-                await chat.save();
-                chatId = chat._id;
-            } else {
-                const tempChat = new TempChat({ anonymousId: req.session.anonymousId, messages: [] });
-                await tempChat.save();
-                chatId = tempChat._id;
-            }
-            req.session.currentChatId = chatId;
+            const chat = new Chat({ user: req.session.user, messages: [] });
+            await chat.save();
+            chatId = chat._id;
+            req.session.currentChatId = chat._id;
         }
         const { message, context } = req.body;
         const files = req.files || [];
 
-        let chat;
-        if (req.session.user) {
-            chat = await Chat.findOne({ _id: chatId, user: req.session.user });
-        } else {
-            chat = await TempChat.findOne({ _id: chatId, anonymousId: req.session.anonymousId });
-        }
+        const chat = await Chat.findById(chatId);
         if (!chat) {
             return res.status(404).json({ error: 'Chat não encontrado' });
         }
@@ -1416,12 +1313,7 @@ app.post('/chat', allowAnonymous, upload.array('files'), async (req, res) => {
         let profileSummary = "Perfil não cadastrado.";
         let fullProfileData = {};
         try {
-            let profile;
-            if (req.session.user) {
-                profile = await Profile.findOne({ user: req.session.user });
-            } else {
-                profile = await TempProfile.findOne({ anonymousId: req.session.anonymousId });
-            }
+            const profile = await Profile.findOne({ user: req.session.user });
             if (profile && profile.profileData) {
                 profileSummary = summarizeProfile(profile.profileData);
                 fullProfileData = profile.profileData;  // Armazenar dados completos
@@ -1474,22 +1366,23 @@ app.post('/chat', allowAnonymous, upload.array('files'), async (req, res) => {
         const currentDate = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
         systemPrompt += `\n\nDATA ATUAL: ${currentDate}. Sempre use esta data como referência para períodos relativos não especificados pelo usuário (ex.: "últimos 5 anos" significa de ${new Date(new Date().setFullYear(new Date().getFullYear() - 5)).getFullYear()} a ${new Date().getFullYear()}). Se o período for explícito, respeite-o.`;
 
+
         if (plan.profundidade_tecnica === 'iniciante') {
-            systemPrompt += `\n\nUSUÁRIO INICIANTE: Explique jargões, use analogias, evite excesso técnico.`;
-        } else if (plan.profundidade_tecnica === 'avancado') {
-            systemPrompt += `\n\nUSUÁRIO AVANÇADO: Use ROIC, WACC, beta, DCF sem explicação básica.`;
-        }
+    systemPrompt += `\n\nUSUÁRIO INICIANTE: Explique jargões, use analogias, evite excesso técnico.`;
+} else if (plan.profundidade_tecnica === 'avancado') {
+    systemPrompt += `\n\nUSUÁRIO AVANÇADO: Use ROIC, WACC, beta, DCF sem explicação básica.`;
+}
 
-        if (allMessages.length === 0) {
-            systemPrompt += `\n\n⚠️ IMPORTANTE: Este é um NOVO CHAT. Não há histórico de conversas anteriores. Não faça referência a conversas passadas.`;
-        }
+if (allMessages.length === 0) {
+    systemPrompt += `\n\n⚠️ IMPORTANTE: Este é um NOVO CHAT. Não há histórico de conversas anteriores. Não faça referência a conversas passadas.`;
+}
 
-        let messagesForAI = [
-            { role: 'system', content: systemPrompt },
-            // NOVO: Adicionar perfil completo do usuário como contexto (todos os dados preenchidos)
-            { role: 'system', content: `Perfil completo de investimento do usuário (dados preenchidos): ${JSON.stringify(fullProfileData)}` },
-            ...contextMessages
-        ];
+let messagesForAI = [
+    { role: 'system', content: systemPrompt },
+    // NOVO: Adicionar perfil completo do usuário como contexto (todos os dados preenchidos)
+    { role: 'system', content: `Perfil completo de investimento do usuário (dados preenchidos): ${JSON.stringify(fullProfileData)}` },
+    ...contextMessages
+];
 
         // Adicionar contexto do sistema se fornecido
         if (context && context.focusedIndicator && context.allIndicators) {
@@ -1539,21 +1432,9 @@ app.post('/chat', allowAnonymous, upload.array('files'), async (req, res) => {
         if (chat.messages.length > 20) {
             chat.messages = chat.messages.slice(-20);
         }
-        if (req.session.user) {
-            await chat.save();
-        } else {
-            await TempChat.findByIdAndUpdate(chatId, { messages: chat.messages });
-        }
-
-        // Incrementar tempo de uso anônimo
-        if (!req.session.user && req.session.dailyUsage) {
-            req.session.dailyUsage.minutesUsed += 1;
-            if (req.session.dailyUsage.minutesUsed >= 5) {
-                // Opcional: notificar frontend, mas allowAnonymous já bloqueia
-            }
-        }
+        await chat.save();
         
-        logger.info(`Mensagem processada para usuário ${req.session.user || 'anônimo'}`);
+        logger.info(`Mensagem processada para usuário ${req.session.user}`);
         res.json({ response: aiResponse });
         
     } catch (error) {
@@ -1636,31 +1517,17 @@ app.delete('/history', requireLogin, async (req, res) => {
     }
 });
 
-app.post('/save-profile', allowAnonymous, async (req, res) => {
+app.post('/save-profile', requireLogin, async (req, res) => {
     try {
         const { profileData } = req.body;
-        let profile;
-        if (req.session.user) {
-            profile = await Profile.findOneAndUpdate(
-                { user: req.session.user },
-                { profileData, updatedAt: new Date() },
-                { upsert: true, new: true }
-            );
-        } else {
-            profile = await TempProfile.findOneAndUpdate(
-                { anonymousId: req.session.anonymousId },
-                { profileData, updatedAt: new Date() },
-                { upsert: true, new: true }
-            );
-        }
+        const userId = req.session.user;
 
-        // Incrementar tempo de uso anônimo
-        if (!req.session.user && req.session.dailyUsage) {
-            req.session.dailyUsage.minutesUsed += 1;
-            if (req.session.dailyUsage.minutesUsed >= 5) {
-                // Opcional: notificar frontend, mas allowAnonymous já bloqueia
-            }
-        }
+        // Salva ou atualiza o perfil
+        const profile = await Profile.findOneAndUpdate(
+            { user: userId },
+            { profileData, updatedAt: new Date() },
+            { upsert: true, new: true }
+        );
 
         res.json({ success: true, profile });
     } catch (error) {
@@ -1669,14 +1536,10 @@ app.post('/save-profile', allowAnonymous, async (req, res) => {
     }
 });
 
-app.get('/load-profile', allowAnonymous, async (req, res) => {
+app.get('/load-profile', requireLogin, async (req, res) => {
     try {
-        let profile;
-        if (req.session.user) {
-            profile = await Profile.findOne({ user: req.session.user });
-        } else {
-            profile = await TempProfile.findOne({ anonymousId: req.session.anonymousId });
-        }
+        const userId = req.session.user;
+        const profile = await Profile.findOne({ user: userId });
 
         if (profile) {
             res.json({ success: true, profileData: profile.profileData });
