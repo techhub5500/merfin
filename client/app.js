@@ -92,6 +92,87 @@ function renderSuggestionsCarousel() {
     }
 }
 
+function startAnonymousTimer(initialTimeLeft) {
+    let timeLeft = initialTimeLeft * 60; // Converter minutos para segundos
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            showRegistrationModal(); // Mostrar modal de cadastro quando tempo acabar
+        }
+    }, 1000); // Decrementar a cada segundo
+}
+
+function showRegistrationModal() {
+    // Criar e mostrar modal de cadastro para usuários anônimos
+    const modal = document.createElement('div');
+    modal.id = 'anonymous-registration-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+    modal.innerHTML = `
+        <div style="background: white; padding: 20px; border-radius: 10px; max-width: 400px; text-align: center;">
+            <h3>Tempo de uso gratuito esgotado!</h3>
+            <p>Cadastre-se para continuar explorando a plataforma.</p>
+            <form id="anonymous-register-form">
+                <input type="text" id="anon-name" placeholder="Nome" required>
+                <input type="email" id="anon-email" placeholder="Email" required>
+                <input type="password" id="anon-password" placeholder="Senha" required>
+                <input type="text" id="anon-cpf" placeholder="CPF" required>
+                <input type="text" id="anon-telefone" placeholder="Telefone" required>
+                <button type="submit">Cadastrar</button>
+            </form>
+            <button id="close-anon-modal" style="margin-top: 10px; background: none; border: none; color: red; cursor: pointer;">Fechar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Event listener para fechar modal
+    document.getElementById('close-anon-modal').addEventListener('click', () => modal.remove());
+
+    // Event listener para submit do formulário
+    document.getElementById('anonymous-register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('anon-name').value;
+        const email = document.getElementById('anon-email').value;
+        const password = document.getElementById('anon-password').value;
+        const cpf = document.getElementById('anon-cpf').value;
+        const telefone = document.getElementById('anon-telefone').value;
+
+        if (!cpf || !telefone) {
+            alert('CPF e telefone são obrigatórios.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ name, email, password, cpf, telefone })
+            });
+            const data = await response.json();
+            if (data.success) {
+                modal.remove();
+                window.location.reload(); // Recarregar página para modo logado
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        } catch (error) {
+            alert('Erro de conexão.');
+        }
+    });
+}
+
 // ========== FUNÇÕES DE CARDS ==========
 async function updateCompanyCards() {
     const tickers = getRandomTickers().join(',');
@@ -457,17 +538,23 @@ window.researchCompany = async function(ticker) {
 // ========== EVENT LISTENERS ==========
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar se o usuário está logado
-    fetch(`${API_URL}/check-login`, { credentials: 'include' }) // ✅ ADICIONAR
-    .then(response => response.json())
-    .then(data => {
-        if (!data.loggedIn) {
-            window.location.href = '/login.html';
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao verificar login:', error);
+    fetch(`${API_URL}/check-anonymous`, { credentials: 'include' })
+.then(response => response.json())
+.then(data => {
+    if (data.loggedIn) {
+        // Usuário logado, prosseguir normalmente
+    } else if (data.anonymous) {
+        // Modo anônimo: iniciar timer com tempo restante
+        startAnonymousTimer(data.timeLeft);
+    } else {
+        // Erro ou sessão inválida, redirecionar para login
         window.location.href = '/login.html';
-    });
+    }
+})
+.catch(error => {
+    console.error('Erro ao verificar acesso:', error);
+    window.location.href = '/login.html';
+});
 
     // ========== NOTÍCIAS ==========
     const noticiasBtn = document.getElementById('noticias-btn');
