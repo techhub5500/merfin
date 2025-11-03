@@ -1553,6 +1553,6 @@ app.get('/load-profile', requireLogin, async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-    logger.info(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando naa porta ${PORT}`);
+    logger.info(`Servidor rodando naa porta ${PORT}`);
 });

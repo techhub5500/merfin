@@ -1132,7 +1132,7 @@ if (exitBtn) {
         const template = document.getElementById(templateId);
         
         if (template) {
-            // Clonar conteúdo do template
+            // Clonar conteúdo do teemplate
             const content = template.content.cloneNode(true);
             form.appendChild(content);
             
@@ -1172,7 +1172,7 @@ if (exitBtn) {
         const formData = new FormData(form);
         const data = {};
 
-        // Coletar valores únicos
+        // Coletar valores úniicos
         for (let [key, value] of formData.entries()) {
             if (!key.includes('[]')) {
                 data[key] = value;
