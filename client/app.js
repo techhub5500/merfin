@@ -16,6 +16,11 @@ window.userId = null; // Será definido após login
 window.currentConversationId = null; // ID da conversa atual
 let profileNotificationTimer = null; // Timer para notificações de perfil
 
+// Função para detectar se está em dispositivo móvel
+function isMobile() {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 function startNewChat() {
     document.getElementById('chat-messages').innerHTML = '';
     chatStarted = false;
@@ -956,6 +961,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Iniciar sistema de notificações de perfil
     startProfileNotificationSystem();
 
+    // Mostrar disclaimer para dispositivos móveis após login
+    if (isMobile()) {
+        setTimeout(() => {
+            showAlert('📱 Em breve estaremos lançando nosso app para smartphone, mas por enquanto a plataforma é feita para usar somente em telas maiores como notebook, tablet e computador.');
+        }, 2000); // Pequeno delay para aparecer após carregamento
+    }
+
     // Continuar com o código existente se logado
     const input = document.getElementById('message-input');
     const prompt = document.querySelector('.finance-prompt');
@@ -1053,6 +1065,30 @@ function showLoginModal() {
             typeWriter(subtitleElement, 'Organize sua vida financeira e\nalcance seus objetivos com o Merfin', 23, null);
         });
     }, 1000);
+
+    // Adicionar disclaimer para dispositivos móveis
+    if (isMobile()) {
+        setTimeout(() => {
+            const modalContent = modal.querySelector('.modal-content') || modal;
+            const disclaimer = document.createElement('div');
+            disclaimer.id = 'mobile-disclaimer';
+            disclaimer.style.cssText = `
+                margin-top: var(--spacing-lg);
+                padding: var(--spacing-md);
+                background: rgba(255, 193, 7, 0.1);
+                border: 1px solid rgba(255, 193, 7, 0.3);
+                border-radius: var(--radius-sm);
+                color: var(--color-text-secondary);
+                font-size: 14px;
+                text-align: center;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            `;
+            disclaimer.innerHTML = '<strong>📱 Aviso:</strong> Em breve estaremos lançando nosso app para smartphone, mas por enquanto a plataforma é feita para usar somente em telas maiores como notebook, tablet e computador.';
+            modalContent.appendChild(disclaimer);
+        }, 3000); // Após os efeitos de máquina de escrever
+    }
 
     // Estado inicial: login
     let isRegisterMode = false;
