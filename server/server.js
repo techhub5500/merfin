@@ -16,14 +16,12 @@ const PORT = process.env.PORT || 3000;
 // Configuração CORS
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production'
-        ? [
-            'https://merfin-home.onrender.com',      // Frontend
-            'https://merfin-server.onrender.com'     // Servidor (para caso precise)
-          ]
-        : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5500'],
+        ? ['https://merfin-home.onrender.com']
+        : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5500', 'http://127.0.0.1:5500'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
