@@ -933,3 +933,104 @@
     }
 }
 
+/* iPhone-specific responsiveness */
+@media (max-width: 390px) {
+    /* iPhone 12/13 mini */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card {
+        padding: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card h4 {
+        font-size: 12px;
+    }
+
+    .dashboard-summary-card p {
+        font-size: 18px;
+    }
+
+    .dashboard-block-header h3 {
+        font-size: 12px;
+    }
+
+    .categoria-nome,
+    .categoria-valor,
+    .categoria-percent {
+        font-size: 12px;
+    }
+
+    .subcategoria-item {
+        font-size: 12px;
+    }
+
+    .status-label {
+        font-size: 12px;
+    }
+
+    .status-value {
+        font-size: 16px;
+    }
+
+    .quote-text {
+        font-size: 16px;
+    }
+
+    .quote-author {
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 391px) and (max-width: 428px) {
+    /* iPhone 12/13/14 */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card {
+        padding: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card h4 {
+        font-size: 13px;
+    }
+
+    .dashboard-summary-card p {
+        font-size: 19px;
+    }
+
+    .dashboard-block-header h3 {
+        font-size: 13px;
+    }
+
+    .categoria-nome,
+    .categoria-valor,
+    .categoria-percent {
+        font-size: 13px;
+    }
+
+    .subcategoria-item {
+        font-size: 13px;
+    }
+
+    .status-label {
+        font-size: 13px;
+    }
+
+    .status-value {
+        font-size: 17px;
+    }
+
+    .quote-text {
+        font-size: 17px;
+    }
+
+    .quote-author {
+        font-size: 13px;
+    }
+}
+
