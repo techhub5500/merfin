@@ -2,7 +2,7 @@
 // Detectar ambiente automaticamente
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000'
-    : 'https://merfin-home.onrender.com';
+    : 'https://merfin-server.onrender.com';
 
 console.log('🌐 API URL configurada:', API_URL);
 // ============================================================
