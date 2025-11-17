@@ -2048,6 +2048,169 @@ body {
     }
 }
 
+/* Responsividade específica para iPhone 12/13 mini (375px viewport) */
+@media (max-width: 390px) and (max-height: 844px) {
+    .modal-content {
+        width: 98%;
+        height: 95%;
+        max-height: 95vh;
+    }
+
+    .modal-left {
+        height: 35%;
+    }
+
+    .modal-left img {
+        height: 75%;
+    }
+
+    .modal-right {
+        padding: var(--spacing-sm);
+    }
+
+    .welcome-text h1 {
+        font-size: 22px;
+    }
+
+    .welcome-text p {
+        font-size: 14px;
+    }
+
+    .modal-right h2 {
+        font-size: 18px;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .modal-right input {
+        font-size: 16px;
+        padding: var(--spacing-xs);
+    }
+
+    .modal-right button {
+        font-size: 13px;
+        width: 90px;
+        height: 45px;
+    }
+
+    .button-container {
+        gap: var(--spacing-sm);
+    }
+
+    /* Sidebar mais compacta */
+    .sidebar {
+        width: 220px;
+    }
+
+    .sidebar.open {
+        width: 220px;
+    }
+
+    /* Chat mais compacto */
+    .chat-messages {
+        width: 98%;
+        padding: var(--spacing-xs);
+    }
+
+    .chat-input {
+        width: 98%;
+    }
+
+    .chat-input textarea {
+        font-size: 16px;
+        height: 80px;
+    }
+}
+
+/* Responsividade específica para iPhone 12/13/14 (390px viewport) */
+@media (min-width: 391px) and (max-width: 428px) and (max-height: 926px) {
+    .modal-content {
+        width: 96%;
+        height: 92%;
+        max-height: 92vh;
+    }
+
+    .modal-left {
+        height: 38%;
+    }
+
+    .modal-left img {
+        height: 78%;
+    }
+
+    .modal-right {
+        padding: var(--spacing-md);
+    }
+
+    .welcome-text h1 {
+        font-size: 24px;
+    }
+
+    .welcome-text p {
+        font-size: 15px;
+    }
+
+    .modal-right h2 {
+        font-size: 19px;
+    }
+
+    .modal-right input {
+        font-size: 16px;
+        padding: var(--spacing-sm);
+    }
+
+    .modal-right button {
+        font-size: 14px;
+        width: 95px;
+        height: 48px;
+    }
+
+    .button-container {
+        gap: var(--spacing-md);
+    }
+
+    /* Sidebar otimizada */
+    .sidebar {
+        width: 240px;
+    }
+
+    .sidebar.open {
+        width: 240px;
+    }
+
+    /* Chat otimizado */
+    .chat-messages {
+        width: 97%;
+        padding: var(--spacing-sm);
+    }
+
+    .chat-input {
+        width: 97%;
+    }
+
+    .chat-input textarea {
+        font-size: 16px;
+        height: 90px;
+    }
+
+    /* Dashboard cards */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card {
+        padding: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card h4 {
+        font-size: 14px;
+    }
+
+    .dashboard-summary-card p {
+        font-size: 18px;
+    }
+}
+
 /* Responsividade para widescreen */
 @media (min-width: 1200px) {
     .sidebar {
