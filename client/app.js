@@ -21,6 +21,78 @@ function isMobile() {
     return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
+// Função para mostrar modal de disclaimer para mobile
+function showMobileDisclaimerModal() {
+    // Verificar se já existe
+    if (document.getElementById('mobile-disclaimer-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'mobile-disclaimer-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+
+    const content = document.createElement('div');
+    content.style.cssText = `
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-xl);
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+        box-shadow: var(--shadow-lg);
+    `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+    `;
+    closeBtn.onmouseover = () => closeBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+    closeBtn.onmouseout = () => closeBtn.style.background = 'none';
+    closeBtn.onclick = () => modal.remove();
+
+    const message = document.createElement('p');
+    message.style.cssText = `
+        margin: 0;
+        color: var(--color-text-primary);
+        font-size: 15px;
+        line-height: 1.5;
+    `;
+    message.innerHTML = '<strong>📱 Aviso:</strong> Em breve estaremos lançando nosso app para smartphone, mas por enquanto a plataforma é feita para usar somente em telas maiores como notebook, tablet e computador.';
+
+    content.appendChild(closeBtn);
+    content.appendChild(message);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+}
+
 function startNewChat() {
     document.getElementById('chat-messages').innerHTML = '';
     chatStarted = false;
@@ -964,7 +1036,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mostrar disclaimer para dispositivos móveis após login
     if (isMobile()) {
         setTimeout(() => {
-            showAlert('📱 Em breve estaremos lançando nosso app para smartphone, mas por enquanto a plataforma é feita para usar somente em telas maiores como notebook, tablet e computador.');
+            showMobileDisclaimerModal();
         }, 2000); // Pequeno delay para aparecer após carregamento
     }
 
@@ -1079,7 +1151,7 @@ function showLoginModal() {
                 border: 1px solid rgba(255, 193, 7, 0.3);
                 border-radius: var(--radius-sm);
                 color: var(--color-text-secondary);
-                font-size: 14px;
+                font-size: 15px;
                 text-align: center;
                 max-width: 400px;
                 margin-left: auto;
