@@ -2211,6 +2211,96 @@ body {
     }
 }
 
+/* Responsividade específica para dispositivos com 414px × 896px (ex.: iPhone 11, XR) */
+@media (min-width: 391px) and (max-width: 414px) and (max-height: 896px) {
+    .modal-content {
+        width: 94%;
+        height: 90%;
+        max-height: 90vh;
+    }
+
+    .modal-left {
+        height: 40%;
+    }
+
+    .modal-left img {
+        height: 80%;
+    }
+
+    .modal-right {
+        padding: var(--spacing-md);
+    }
+
+    .welcome-text h1 {
+        font-size: 25px;
+    }
+
+    .welcome-text p {
+        font-size: 16px;
+    }
+
+    .modal-right h2 {
+        font-size: 20px;
+    }
+
+    .modal-right input {
+        font-size: 16px;
+        padding: var(--spacing-sm);
+    }
+
+    .modal-right button {
+        font-size: 15px;
+        width: 100px;
+        height: 50px;
+    }
+
+    .button-container {
+        gap: var(--spacing-md);
+    }
+
+    /* Sidebar otimizada */
+    .sidebar {
+        width: 250px;
+    }
+
+    .sidebar.open {
+        width: 250px;
+    }
+
+    /* Chat otimizado */
+    .chat-messages {
+        width: 96%;
+        padding: var(--spacing-sm);
+    }
+
+    .chat-input {
+        width: 96%;
+    }
+
+    .chat-input textarea {
+        font-size: 16px;
+        height: 95px;
+    }
+
+    /* Dashboard cards */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card {
+        padding: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card h4 {
+        font-size: 14px;
+    }
+
+    .dashboard-summary-card p {
+        font-size: 19px;
+    }
+}
+
 /* Responsividade para widescreen */
 @media (min-width: 1200px) {
     .sidebar {

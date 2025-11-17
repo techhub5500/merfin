@@ -1991,6 +1991,49 @@
     }
 }
 
+/* Responsividade específica para dispositivos com 414px × 896px (ex.: iPhone 11, XR) */
+@media (min-width: 391px) and (max-width: 414px) and (max-height: 896px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .dashboard-card {
+        padding: var(--spacing-sm);
+    }
+
+    .dashboard-card h3 {
+        font-size: 19px;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .dashboard-card p {
+        font-size: 18px;
+    }
+
+    .financas-section {
+        padding: var(--spacing-md);
+    }
+
+    .financas-section h2 {
+        margin-bottom: var(--spacing-md);
+    }
+
+    /* Modal de parcelas */
+    .parcelas-modal-content {
+        width: 90%;
+        max-height: 85vh;
+    }
+
+    .parcelas-modal-header {
+        padding: var(--spacing-md);
+    }
+
+    .parcelas-modal-header h3 {
+        font-size: 20px;
+    }
+}
+
 /* Alertas de vencimento */
 .divida-vencimento-proximo {
     border-left: 4px solid var(--color-warning);

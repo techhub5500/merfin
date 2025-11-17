@@ -1034,3 +1034,53 @@
     }
 }
 
+/* Responsividade específica para dispositivos com 414px × 896px (ex.: iPhone 11, XR) */
+@media (min-width: 391px) and (max-width: 414px) and (max-height: 896px) {
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card {
+        padding: var(--spacing-sm);
+    }
+
+    .dashboard-summary-card h4 {
+        font-size: 14px;
+    }
+
+    .dashboard-summary-card p {
+        font-size: 20px;
+    }
+
+    .dashboard-block-header h3 {
+        font-size: 14px;
+    }
+
+    .categoria-nome,
+    .categoria-valor,
+    .categoria-percent {
+        font-size: 14px;
+    }
+
+    .subcategoria-item {
+        font-size: 14px;
+    }
+
+    .status-label {
+        font-size: 14px;
+    }
+
+    .status-value {
+        font-size: 18px;
+    }
+
+    .quote-text {
+        font-size: 18px;
+    }
+
+    .quote-author {
+        font-size: 14px;
+    }
+}
+
