@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merfin - Finanças</title>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style-core.css">
+    <link rel="stylesheet" href="./dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="favicon.png" alt="Logo" class="logo"> <!-- Adicione um logo se tiver -->
+            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" onclick="showPage('financas')" data-tooltip="Merfin"><img src="iconChat.png" alt="Finanças" ></a>
+            <a href="#" onclick="showPage('minhas-financas')" data-tooltip="Minhas Finanças"><img src="iconFinance.png" alt="Minhas Finanças" ></a>
+            <a href="#" onclick="showPage('perfil')" data-tooltip="Perfil"><img src="iconUser.png" alt="Perfil" ></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="https://api.whatsapp.com/send/?phone=5511915381876&text&type=phone_number&app_absent=0" target="_blank" data-tooltip="Fale Conosco" class="sidebar-contact">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+            </a>
+            <a href="#" onclick="logout()" data-tooltip="Sair"><img src="iconlogout.png" alt="Sair" ></a>
+        </div>
+        <!-- Sidebar footer se necessário -->
+    </div>
+    <div class="content" id="content">
+        <div id="financas" class="page-section active">
+            <div class="chat-container">
+                <!-- Frase de prompt financeiro -->
+                <div class="finance-prompt">
+                    Pergunte Sobre suas Finanças
+                </div>
+                <div class="chat-header">
+                    <button id="new-chat-btn" onclick="startNewChat()"><img src="novoChat.png" alt="Novo Chat" style="width: 28px; height: 28px;"></button>
+                    <button id="history-btn" onclick="showChatHistoryModal()" title="Histórico"><img src="iconHistory.png" alt="Histórico" style="width: 28px; height: 28px;"></button>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Mensagens do chat aparecerão aqui -->
+                </div>
+                <div class="chat-input">
+                    <textarea id="message-input" placeholder="Digite sua mensagem..." onkeypress="handleKeyPress(event)"></textarea>
+                    <button onclick="sendMessage()"><img src="enviar.png" alt="Enviar"></button>
+                </div>
+            </div>
+        </div>
+        <div id="minhas-financas" class="page-section">
+            <div class="subpage-header">
+                <button onclick="showSubPage('minhas-financas-content')" class="subpage-btn active">Minhas Finanças</button>
+                <button onclick="showSubPage('dashboard-content')" class="subpage-btn">Dashboard</button>
+                <div class="month-selector">
+                    <button onclick="previousMonth()">◀</button>
+                    <span id="current-month-display">Mês Atual</span>
+                    <button onclick="nextMonth()">▶</button>
+                </div>
+                <button id="accumulated-btn" onclick="toggleAccumulatedMode()" class="subpage-btn" style="display: none;">Filtrar</button>
+            </div>
+            <div id="minhas-financas-content" class="subpage active">
+    <div class="financas-section">
+                    <h2>Minhas Finanças</h2>
+                    <div class="dashboard">
+                        <div class="dashboard-card">
+                            <h3>Saldo Líquido</h3>
+                            <p id="saldo-liquido">R$ 0,00</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Total Receitas</h3>
+                            <p id="total-receitas">R$ 0,00</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Total Despesas</h3>
+                            <p id="total-despesas">R$ 0,00</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Receitas Pendentes</h3>
+                            <p id="receitas-pendentes">R$ 0,00</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Despesas Pendentes</h3>
+                            <p id="despesas-pendentes">R$ 0,00</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-extra">
+                        <div class="recent-transactions">
+                           
+                            <ul id="recent-list">
+                                <!-- Itens serão adicionados dinamicamente -->
+                            </ul>
+                        </div>
+                    </div>
+                    <datalist id="categories-list"></datalist>
+                    <div class="spreadsheets">
+                        <div class="spreadsheet-group">
+                            <div class="spreadsheet">
+                                <h3>Receitas Recorrentes</h3>
+                                <table id="receitas-recorrentes-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data <select id="filter-select-date-receitas-recorrentes" class="filter-select" data-table="receitas-recorrentes" data-column="date" style="display:none;">
+                <option value="date-desc">Mais Recente</option>
+                <option value="date-asc">Mais Antigo</option>
+            </select> <i id="filter-icon-date-receitas-recorrentes" class="fas fa-chevron-down filter-icon" data-table="receitas-recorrentes" data-column="date" style="cursor:pointer;"></i></th>
+                                            <th>Status</th>
+                                            <th>Descrição</th>
+                                            <th>Valor <select id="filter-select-value-receitas-recorrentes" class="filter-select" data-table="receitas-recorrentes" data-column="value" style="display:none;">
+                <option value="value-desc">Maiores Valores</option>
+                <option value="value-asc">Menores Valores</option>
+            </select> <i id="filter-icon-value-receitas-recorrentes" class="fas fa-chevron-down filter-icon" data-table="receitas-recorrentes" data-column="value" style="cursor:pointer;"></i></th>
+                                            <th>Categoria</th>
+                                            <th>Subcategoria</th>
+                                            <th>Notas</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Linhas serão adicionadas dinamicamente -->
+                                    </tbody>
+                                </table>
+                                <button onclick="addRow('receitas-recorrentes')">Adicionar Receita Recorrente</button>
+                            </div>
+                            <div class="spreadsheet">
+                                <h3>Receitas Variáveis</h3>
+                                <table id="receitas-variaveis-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data <select id="filter-select-date-receitas-variaveis" class="filter-select" data-table="receitas-variaveis" data-column="date" style="display:none;">
+                <option value="date-desc">Mais Recente</option>
+                <option value="date-asc">Mais Antigo</option>
+            </select> <i id="filter-icon-date-receitas-variaveis" class="fas fa-chevron-down filter-icon" data-table="receitas-variaveis" data-column="date" style="cursor:pointer;"></i></th>
+                                            <th>Status</th>
+                                            <th>Fonte</th>
+                                            <th>Valor <select id="filter-select-value-receitas-variaveis" class="filter-select" data-table="receitas-variaveis" data-column="value" style="display:none;">
+                <option value="value-desc">Maiores Valores</option>
+                <option value="value-asc">Menores Valores</option>
+            </select> <i id="filter-icon-value-receitas-variaveis" class="fas fa-chevron-down filter-icon" data-table="receitas-variaveis" data-column="value" style="cursor:pointer;"></i></th>
+                                            <th>Categoria</th>
+                                            <th>Subcategoria</th>
+                                            <th>Notas</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Linhas serão adicionadas dinamicamente -->
+                                    </tbody>
+                                </table>
+                                <button onclick="addRow('receitas-variaveis')">Adicionar Receita Variável</button>
+                            </div>
+                        </div>
+                        <div class="spreadsheet-group">
+                            <div class="spreadsheet">
+                                <h3>Despesas Fixas</h3>
+                                <table id="despesas-fixas-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data <select id="filter-select-date-despesas-fixas" class="filter-select" data-table="despesas-fixas" data-column="date" style="display:none;">
+                <option value="date-desc">Mais Recente</option>
+                <option value="date-asc">Mais Antigo</option>
+            </select> <i id="filter-icon-date-despesas-fixas" class="fas fa-chevron-down filter-icon" data-table="despesas-fixas" data-column="date" style="cursor:pointer;"></i></th>
+                                            <th>Status</th>
+                                            <th>Descrição</th>
+                                            <th>Categoria</th>
+                                            <th>Subcategoria</th>
+                                            <th>Valor <select id="filter-select-value-despesas-fixas" class="filter-select" data-table="despesas-fixas" data-column="value" style="display:none;">
+                <option value="value-desc">Maiores Valores</option>
+                <option value="value-asc">Menores Valores</option>
+            </select> <i id="filter-icon-value-despesas-fixas" class="fas fa-chevron-down filter-icon" data-table="despesas-fixas" data-column="value" style="cursor:pointer;"></i></th>
+                                            <th>Método</th>
+                                            <th>Notas</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Linhas serão adicionadas dinamicamente -->
+                                    </tbody>
+                                </table>
+                                <button onclick="addRow('despesas-fixas')">Adicionar Despesa Fixa</button>
+                            </div>
+                            <div class="spreadsheet">
+                                <h3>Despesas Variáveis</h3>
+                                <table id="despesas-variaveis-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data <select id="filter-select-date-despesas-variaveis" class="filter-select" data-table="despesas-variaveis" data-column="date" style="display:none;">
+                <option value="date-desc">Mais Recente</option>
+                <option value="date-asc">Mais Antigo</option>
+            </select> <i id="filter-icon-date-despesas-variaveis" class="fas fa-chevron-down filter-icon" data-table="despesas-variaveis" data-column="date" style="cursor:pointer;"></i></th>
+                                            <th>Status</th>
+                                            <th>Descrição</th>
+                                            <th>Categoria</th>
+                                            <th>Subcategoria</th>
+                                            <th>Valor <select id="filter-select-value-despesas-variaveis" class="filter-select" data-table="despesas-variaveis" data-column="value" style="display:none;">
+                <option value="value-desc">Maiores Valores</option>
+                <option value="value-asc">Menores Valores</option>
+            </select> <i id="filter-icon-value-despesas-variaveis" class="fas fa-chevron-down filter-icon" data-table="despesas-variaveis" data-column="value" style="cursor:pointer;"></i></th>
+                                            <th>Método</th>
+                                            <th>Notas</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Linhas serão adicionadas dinamicamente -->
+                                    </tbody>
+                                </table>
+                                <button onclick="addRow('despesas-variaveis')">Adicionar Despesa Variável</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="dashboard-content" class="subpage">
+                <div class="dashboard-page">
+                    <!-- Cards Superiores -->
+                    <div class="dashboard-summary-cards">
+                        <div class="dashboard-summary-card">
+                            <h4>Saldo Líquido</h4>
+                            <p id="dash-saldo-liquido">R$ 0,00</p>
+                        </div>
+                        <div class="dashboard-summary-card">
+                            <h4>Total Receitas</h4>
+                            <p id="dash-total-receitas">R$ 0,00</p>
+                        </div>
+                        <div class="dashboard-summary-card">
+                            <h4>Total Despesas</h4>
+                            <p id="dash-total-despesas">R$ 0,00</p>
+                        </div>
+                        <div class="dashboard-summary-card patrimonio-card" id="patrimonio-card">
+                            <h4>Patrimônio</h4>
+                            <p id="dash-patrimonio-total">R$ 0,00</p>
+                            <div class="patrimonio-tooltip" id="patrimonio-tooltip">
+                                <table class="patrimonio-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="patrimonio-tooltip-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linha com Receitas e Despesas -->
+                    <div class="dashboard-row">
+                        <!-- Principais Fontes de Receita -->
+                        <div class="dashboard-block">
+                            <div class="dashboard-block-header">
+                                <h3>Principais Fontes de Receita</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <div id="receitas-categorias" class="categorias-list">
+                                    <!-- Categorias serão adicionadas dinamicamente -->
+                                </div>
+                                <div class="dashboard-totals">
+                                    <div class="dashboard-total-item">
+                                        <span>Receita Recorrente:</span>
+                                        <span id="receita-recorrente-total">R$ 0,00</span>
+                                    </div>
+                                    <div class="dashboard-total-item">
+                                        <span>Receita Variável:</span>
+                                        <span id="receita-variavel-total">R$ 0,00</span>
+                                    </div>
+                                    <div class="dashboard-total-item total-final">
+                                        <span>Total Geral:</span>
+                                        <span id="receita-total-geral">R$ 0,00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Principais Fontes de Despesa -->
+                        <div class="dashboard-block">
+                            <div class="dashboard-block-header">
+                                <h3>Principais Fontes de Despesa</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <div id="despesas-categorias" class="categorias-list">
+                                    <!-- Categorias serão adicionadas dinamicamente -->
+                                </div>
+                                <div class="dashboard-totals">
+                                    <div class="dashboard-total-item">
+                                        <span>Despesa Fixa:</span>
+                                        <span id="despesa-fixa-total">R$ 0,00</span>
+                                    </div>
+                                    <div class="dashboard-total-item">
+                                        <span>Despesa Variável:</span>
+                                        <span id="despesa-variavel-total">R$ 0,00</span>
+                                    </div>
+                                    <div class="dashboard-total-item total-final">
+                                        <span>Total Geral:</span>
+                                        <span id="despesa-total-geral">R$ 0,00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linha com Gráficos de Rosca de Receitas e Despesas -->
+                    <div class="dashboard-row">
+                        <!-- Gráfico de Distribuição de Receitas -->
+                        <div class="dashboard-block dashboard-chart-block">
+                            <div class="dashboard-block-header">
+                                <h3>Distribuição de Receitas</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <canvas id="receitas-pie-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico de Distribuição de Despesas -->
+                        <div class="dashboard-block dashboard-chart-block">
+                            <div class="dashboard-block-header">
+                                <h3>Distribuição de Despesas</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <canvas id="despesas-pie-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linha com Gráfico de Subcategorias de Receitas e Despesas -->
+                    <div class="dashboard-row">
+                        <!-- Gráfico de Distribuição de Subcategorias de Receitas -->
+                        <div class="dashboard-block dashboard-chart-block">
+                            <div class="dashboard-block-header">
+                                <h3>Distribuição de Subcategorias de Receitas</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <canvas id="subcategorias-receitas-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico de Distribuição de Subcategorias de Despesas -->
+                        <div class="dashboard-block dashboard-chart-block">
+                            <div class="dashboard-block-header">
+                                <h3>Distribuição de Subcategorias de Despesas</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <canvas id="subcategorias-despesas-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linha com Objetivos e Dívidas -->
+                    <div class="dashboard-row">
+                        <!-- Objetivos Financeiros -->
+                        <div class="dashboard-block">
+                            <div class="dashboard-block-header">
+                                <h3>Objetivos Financeiros</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <div id="objetivos-list" class="objetivos-list">
+                                    <!-- Objetivos serão adicionados dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dívidas e Parcelamentos -->
+                        <div class="dashboard-block">
+                            <div class="dashboard-block-header">
+                                <h3>Dívidas e Parcelamentos</h3>
+                            </div>
+                            <div class="dashboard-block-content">
+                                <div id="dividas-dashboard-list" class="dividas-dashboard-list">
+                                    <!-- Dívidas serão adicionadas dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blocos de Anotações e Frases Motivacionais -->
+                    <div class="dashboard-bottom-row">
+                        <!-- Bloco de Anotações -->
+                        <div class="dashboard-notes-container">
+                            <div class="dashboard-block dashboard-notes-block">
+                                <div class="dashboard-block-header">
+                                    <h3>Anotações</h3>
+                                    <span class="notes-subtitle">Página <span id="current-page-number">1</span></span>
+                                </div>
+                                <div class="dashboard-block-content">
+                                    <div class="notes-page" id="notes-page-container">
+                                        <div class="notes-line"><input type="text" class="notes-input" data-page="1" data-line="1" placeholder=""></div>
+                                        <div class="notes-line"><input type="text" class="notes-input" data-page="1" data-line="2" placeholder=""></div>
+                                        <div class="notes-line"><input type="text" class="notes-input" data-page="1" data-line="3" placeholder=""></div>
+                                        <div class="notes-line"><input type="text" class="notes-input" data-page="1" data-line="4" placeholder=""></div>
+                                        <div class="notes-line"><input type="text" class="notes-input" data-page="1" data-line="5" placeholder=""></div>
+                                    </div>
+                                    <div class="notes-navigation">
+                                        <button class="notes-nav-btn" id="prev-page-btn" onclick="previousNotesPage()" style="visibility: hidden;">
+                                            ← Página Anterior
+                                        </button>
+                                        <button class="notes-nav-btn" id="next-page-btn" onclick="nextNotesPage()">
+                                            Próxima Página →
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bloco de Frases Motivacionais -->
+                        <div class="dashboard-motivational-container">
+                            <div class="dashboard-block dashboard-motivational-block">
+                                <div class="dashboard-block-header">
+                                    <h3>Frase do Dia</h3>
+                                </div>
+                                <div class="dashboard-block-content">
+                                    <div class="motivational-quote" id="motivational-quote">
+                                        <blockquote class="quote-text" id="quote-text"></blockquote>
+                                        <cite class="quote-author" id="quote-author"></cite>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="perfil" class="page-section">
+            <div class="profile-container">
+                <h1>Perfil</h1>
+                <div class="profile-sections">
+                    <div class="profile-section">
+                        <h2>Informações Pessoais</h2>
+                        <label for="nome">Nome completo:</label>
+                        <input type="text" id="nome" placeholder="Digite seu nome">
+                        
+                        <label for="idade">Idade:</label>
+                        <input type="number" id="idade" placeholder="Digite sua idade">
+                        
+                        <label for="profissao">Profissão/Ocupação:</label>
+                        <input type="text" id="profissao" placeholder="Digite sua profissão">
+                        
+                        <label for="localizacao">Localização:</label>
+                        <input type="text" id="localizacao" placeholder="Cidade/Estado">
+                        
+                        <label for="contato">Email ou telefone:</label>
+                        <input type="text" id="contato" placeholder="Digite seu email ou telefone">
+                        
+                        <label for="sobre-voce">Conte-nos mais sobre você:</label>
+                        <textarea id="sobre-voce" placeholder="Compartilhe sua história financeira, perspectivas, desafios, sonhos e o que você espera alcançar usando esta plataforma. Quanto mais você compartilhar, melhor poderemos ajudá-lo!" rows="6" style="width: 100%; padding: var(--spacing-sm); margin-bottom: var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-background); color: var(--color-text-primary); box-sizing: border-box; resize: vertical; font-family: 'Poppins', sans-serif; font-size: 0.9em;"></textarea>
+                        
+                        <button onclick="saveSection('pessoal')">Salvar Informações Pessoais</button>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h2>Situação Financeira Atual</h2>
+                        
+                        <label for="saldo-conta">Saldo em conta corrente/poupança:</label>
+                        <input type="text" id="saldo-conta" placeholder="R$ 0,00" oninput="formatCurrency(this)">
+                        
+                        <label for="ativos">Patrimônio:</label>
+                        <div class="patrimonio-container">
+                            <div class="patrimonio-header">
+                                <span>Descrição</span>
+                                <span>Valor</span>
+                                <span>Ações</span>
+                            </div>
+                            <div class="patrimonio-list" id="patrimonio-list">
+                                <!-- Linhas de patrimônio serão adicionadas dinamicamente -->
+                            </div>
+                            <button class="add-patrimonio-btn" onclick="addPatrimonio()">Adicionar Patrimônio</button>
+                            <div class="patrimonio-total">
+                                <label>Total do Patrimônio:</label>
+                                <span id="patrimonio-total">R$ 0,00</span>
+                            </div>
+                        </div>
+                        
+                        <label for="dependentes">Dependentes (quantas pessoas dependem dessa renda?)</label>
+                        <input type="number" id="dependentes" placeholder="Ex: 2">
+                        
+                        <label for="modelo-renda">Modelo de renda (CLT, PJ, autônomo, renda variável?)</label>
+                        <input type="text" id="modelo-renda" placeholder="Digite o modelo de renda">
+                        
+                        <button onclick="saveSection('financeira')">Salvar Situação Financeira</button>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h2>Objetivos Financeiros</h2>
+                        <label for="poupanca-mensal">Meta de poupança mensal:</label>
+                        <input type="text" id="poupanca-mensal" placeholder="R$ 0,00" oninput="formatCurrency(this)">
+                        
+                        <label for="fundo-emergencia">Fundo de emergência desejado:</label>
+                        <input type="text" id="fundo-emergencia" placeholder="R$ 0,00" oninput="formatCurrency(this)">
+                        
+                        <label for="prazo-emergencia">Prazo para fundo de emergência:</label>
+                        <input type="text" id="prazo-emergencia" placeholder="Ex.: 6 meses">
+                        
+                        <label for="investimento-mensal">Meta de investimento mensal:</label>
+                        <input type="text" id="investimento-mensal" placeholder="R$ 0,00" oninput="formatCurrency(this)">
+                        
+                        <label for="meta-longo-prazo">Meta de longo prazo:</label>
+                        <input type="text" id="meta-longo-prazo" placeholder="Ex.: Comprar casa">
+                        
+                        <label for="valor-meta-longo">Valor estimado para meta de longo prazo:</label>
+                        <input type="text" id="valor-meta-longo" placeholder="R$ 0,00" oninput="formatCurrency(this)">
+                        
+                        <label for="prazo-meta-longo">Prazo para meta de longo prazo:</label>
+                        <input type="text" id="prazo-meta-longo" placeholder="Ex.: 5 anos">
+                        
+                        <button onclick="saveSection('objetivos')">Salvar Objetivos Financeiros</button>
+                    </div>
+
+                    <div class="profile-section">
+                        <h2>Dívidas e Parcelamentos Ativos</h2>
+                        <div class="dividas-header">
+                            <div class="dividas-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">Total em Dívidas:</span>
+                                    <span class="summary-value" id="total-dividas">R$ 0,00</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">Parcelas Mensais:</span>
+                                    <span class="summary-value" id="parcelas-mensais">R$ 0,00</span>
+                                </div>
+                            </div>
+                            <button onclick="openDividaModal()" class="add-divida-btn">Adicionar Divida</button>
+                        </div>
+                        <div id="dividas-list" class="dividas-list">
+                            <!-- Dívidas serão adicionadas dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Adicione este código ao final do <body> no arquivo index.html (ou equivalente) -->
+<div id="login-modal" style="display: none;">
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-left">
+                <div class="welcome-text">
+                    <h1 id="welcome-title"></h1>
+                    <p id="welcome-subtitle"></p>
+                </div>
+                <!-- Área para foto: substitua pela sua imagem -->
+                <img src="signup.png" alt="Imagem de login" style="width: 100%; height: 60%; object-fit: cover; border-radius: var(--radius-md) 0 0 var(--radius-md);">
+            </div>
+            <div class="modal-right">
+                <h2 id="modal-title">Login ou Cadastro</h2>
+                <form id="login-form">
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="password" id="password" placeholder="Senha" required>
+                    <!-- Campos extras para cadastro, ocultos inicialmente -->
+                    <div id="extra-fields" style="display: none;">
+                        <input type="text" id="modal-nome" placeholder="Nome completo">
+                        <input type="text" id="modal-nascimento" placeholder="Data de nascimento">
+                        <input type="text" id="modal-contato" placeholder="Contato">
+                    </div>
+                    <div class="button-container">
+                        <button type="submit" id="submit-btn">Entrar</button>
+                        <button type="button" id="register-btn">Cadastrar</button>
+                        <button type="button" id="login-btn" style="display: none;">Voltar ao Login</button>
+                    </div>
+                </form>
+                <!-- Card do Plano (oculto inicialmente) -->
+                <div id="plan-card" style="display: none;">
+                    <div class="plan-card-container">
+                        <div class="plan-card-header">
+                            <h3>Plano Merfin</h3>
+                            <div class="plan-price">
+                                <span class="currency">R$</span>
+                                <span class="amount">15</span>
+                                <span class="period">/mês</span>
+                            </div>
+                        </div>
+                        <div class="plan-card-body">
+                            <div class="plan-feature">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Acesso completo à plataforma</span>
+                            </div>
+                            <div class="plan-feature">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Dashboard completo</span>
+                            </div>
+                            <div class="plan-feature">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Assistente IA ilimitado</span>
+                            </div>
+                            <div class="plan-feature">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Controle financeiro avançado</span>
+                            </div>
+                        </div>
+                        <div class="plan-card-footer">
+                            <button type="button" id="finalize-payment-btn" class="finalize-btn">Finalizar e ir para pagamento</button>
+                            <button type="button" id="back-to-form-btn" class="back-btn">Voltar</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="message"></div>
+                <a href="https://api.whatsapp.com/send/?phone=5511915381876&text&type=phone_number&app_absent=0" target="_blank" class="contact-link">💬 Fale Conosco</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botão flutuante para IA -->
+<button id="ai-float-btn" class="none">
+    <span></span>
+    <img src="merfin.png" style="width: 85px; height: 85px; margin-bottom: 20px;">
+</button>
+
+<!-- Modal de IA -->
+<div id="ai-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--color-surface); padding: var(--spacing-lg); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1000; max-width: 500px; width: 90%; text-align: center;">
+    <button class="ai-modal-close-btn" onclick="closeAiModal()" title="Fechar">&times;</button>
+    <h3 id="modal-title"></h3>
+    <p id="modal-desc">Escolha em qual tabela você deseja adicionar a transação para que a IA possa processar corretamente. Para múltiplas transações, separe cada uma com ponto e vírgula (;).</p>
+    <select id="table-select" style="width: 100%; padding: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+        <option value="">Selecione a tabela</option>
+        <option value="receitas-recorrentes">Receitas Recorrentes</option>
+        <option value="receitas-variaveis">Receitas Variáveis</option>
+        <option value="despesas-fixas">Despesas Fixas</option>
+        <option value="despesas-variaveis">Despesas Variáveis</option>
+    </select>
+    <div id="input-section" style="display: none;">
+        <textarea id="ai-description" placeholder="Ex: Recebi  5000 de salário; Recebi um bônus de  350; Recebi aluguel de  1500" style="width: 100%; padding: var(--spacing-xs); margin-bottom: var(--spacing-md); resize: vertical; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-background); color: var(--color-text-primary); font-size: 0.9em; height: 150px; box-sizing: border-box;"></textarea>
+        <div class="button-container">
+            <button id="ai-submit">Enviar para IA</button>
+            <button id="close-modal">Fechar</button>
+        </div>
+        <div id="ai-loading" style="display: none; margin-top: var(--spacing-md);">Processando com IA...</div>
+    </div>
+</div>
+
+<!-- Modal de Dívidas -->
+<div id="divida-modal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeDividaModal()"></div>
+    <div class="modal-content divida-modal-content">
+        <div class="divida-modal-header">
+            <h3 id="divida-modal-title">Adicionar Dívida</h3>
+            <button onclick="closeDividaModal()" class="close-modal-btn">&times;</button>
+        </div>
+        <form id="divida-form" class="divida-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="divida-nome">Nome da Dívida *</label>
+                    <input type="text" id="divida-nome" required placeholder="Ex: Empréstimo Banco X">
+                </div>
+                <div class="form-group">
+                    <label for="divida-tipo">Tipo *</label>
+                    <select id="divida-tipo" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="emprestimo">Empréstimo</option>
+                        <option value="financiamento">Financiamento</option>
+                        <option value="cartao">Cartão de Crédito</option>
+                        <option value="consignado">Consignado</option>
+                        <option value="cheque">Cheque Especial</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="divida-valor-total">Valor Total *</label>
+                    <input type="text" id="divida-valor-total" required placeholder="R$ 0,00" oninput="formatCurrency(this)">
+                </div>
+                <div class="form-group">
+                    <label for="divida-parcelas">Parcelas Restantes *</label>
+                    <input type="number" id="divida-parcelas" required placeholder="Ex: 12" min="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="divida-valor-parcela">Valor da Parcela *</label>
+                    <input type="text" id="divida-valor-parcela" required placeholder="Calculado automaticamente" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="divida-dia-vencimento">Dia de Vencimento *</label>
+                    <input type="number" id="divida-dia-vencimento" required min="1" max="31" placeholder="Ex: 10">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="divida-primeira-parcela">Data da Primeira Parcela *</label>
+                    <input type="date" id="divida-primeira-parcela" required>
+                </div>
+                <div class="form-group">
+                    <!-- Espaço vazio para manter o layout -->
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="save-divida-btn">Salvar Dívida</button>
+                <button type="button" onclick="closeDividaModal()" class="cancel-btn">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Histórico de Chat -->
+<div id="chat-history-modal" class="chat-history-modal" style="display: none;">
+    <div class="chat-history-overlay" onclick="closeChatHistoryModal()"></div>
+    <div class="chat-history-container">
+        <div class="chat-history-header">
+            <h2 class="chat-history-title">Histórico de Conversas</h2>
+            <button class="chat-history-close" onclick="closeChatHistoryModal()" title="Fechar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="chat-history-search">
+            <div class="chat-history-search-wrapper">
+                <i class="fas fa-search chat-history-search-icon"></i>
+                <input type="text" id="chat-history-search" class="chat-history-search-input" placeholder="Buscar por título ou conteúdo..." oninput="searchChatHistory()">
+            </div>
+        </div>
+
+        <div class="chat-history-content">
+            <div class="chat-history-list" id="chat-history-list">
+                <!-- Conversas serão adicionadas dinamicamente -->
+            </div>
+
+            <div class="chat-history-empty" id="chat-history-empty" style="display: none;">
+                <div class="chat-history-empty-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="chat-history-empty-title">Nenhuma conversa encontrada</h3>
+                <p class="chat-history-empty-text">Suas conversas com a IA aparecerão aqui.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal de Parcelas -->
+<div id="parcelas-modal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeParcelasModal()"></div>
+    <div class="modal-content parcelas-modal-content">
+        <div class="parcelas-modal-header">
+            <h3 id="parcelas-modal-title">Parcelas da Dívida</h3>
+            <button onclick="closeParcelasModal()" class="close-modal-btn">&times;</button>
+        </div>
+        <div class="parcelas-modal-summary">
+            <div class="parcelas-summary-item">
+                <span class="parcelas-summary-label">Valor Total:</span>
+                <span class="parcelas-summary-value" id="parcelas-valor-total">R$ 0,00</span>
+            </div>
+            <div class="parcelas-summary-item">
+                <span class="parcelas-summary-label">Valor da Parcela:</span>
+                <span class="parcelas-summary-value" id="parcelas-valor-parcela">R$ 0,00</span>
+            </div>
+            <div class="parcelas-summary-item">
+                <span class="parcelas-summary-label">Progresso:</span>
+                <span class="parcelas-summary-value" id="parcelas-progresso">0/0</span>
+            </div>
+        </div>
+        <div class="parcelas-list-container" id="parcelas-list-container">
+            <!-- Parcelas serão adicionadas dinamicamente -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Chat (para Dashboard e Perfil) -->
+<div id="ai-chat-modal" class="ai-chat-modal" style="display: none;">
+    <div class="ai-chat-overlay" onclick="closeChatModal()"></div>
+    <div class="ai-chat-container" id="ai-chat-container">
+        <div class="ai-chat-header">
+            <h3>Assistente Financeiro</h3>
+            <div class="ai-chat-header-buttons">
+                <button class="ai-chat-close" onclick="closeChatModal()" title="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <!-- Mensagens do chat aparecerão aqui -->
+        </div>
+        <div class="ai-chat-input-container">
+            <textarea id="ai-chat-input" placeholder="Digite sua pergunta sobre finanças..." onkeypress="handleChatModalKeyPress(event)"></textarea>
+            <button onclick="sendChatModalMessage()" class="ai-chat-send-btn">
+                <img src="enviar.png" alt="Enviar">
+            </button>
+        </div>
+    </div>
+</div>
+
+    <script src="./app.js"></script>
+    <script src="./finance.js"></script>
+    <script src="./dashboard.js"></script>
+</body>
+</html>
