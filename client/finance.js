@@ -1103,6 +1103,10 @@ function hideSaveIndicator(indicator) {
     }
 }
 
+function showInputSection() {
+    document.getElementById('input-section').style.display = 'block';
+}
+
 // Função de auto-save com debounce (agora por linha)
 function autoSaveTransaction(type, row) {
     // Cada linha tem seu próprio timeout
