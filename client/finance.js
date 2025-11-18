@@ -1404,7 +1404,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener para o botão de enviar para IA
+    // Event listener para o botão de enviar para IA (removido para evitar duplicação - agora em app.js)
+    /*
     document.getElementById('ai-submit').addEventListener('click', async () => {
         const tableType = document.getElementById('table-select').value;
         const description = document.getElementById('ai-description').value.trim();
@@ -1475,6 +1476,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ai-submit').disabled = false;
         }
     });
+    */
 
     // Event listener para fechar modal
     document.getElementById('close-modal').addEventListener('click', closeAiModal);
