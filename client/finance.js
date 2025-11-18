@@ -4,16 +4,6 @@
 
 let exampleDataAdded = false;
 
-// Função auxiliar para obter subcategorias (compatibilidade)
-function getSubcategoriesForCategory(type, category) {
-    return subcategoriesMap[type] && subcategoriesMap[type][category] ? subcategoriesMap[type][category] : [];
-}
-
-// Função auxiliar para adicionar transação à tabela (compatibilidade)
-function addTransactionToTable(tableType, data) {
-    fillRowWithAI(null, tableType, data);
-}
-
 function updateStatusSelectStyle(select) {
     const value = select.value;
     if (value === 'Recebido' || value === 'Pago') {
@@ -1113,10 +1103,6 @@ function hideSaveIndicator(indicator) {
     }
 }
 
-function showInputSection() {
-    document.getElementById('input-section').style.display = 'block';
-}
-
 // Função de auto-save com debounce (agora por linha)
 function autoSaveTransaction(type, row) {
     // Cada linha tem seu próprio timeout
@@ -1401,6 +1387,78 @@ document.addEventListener('DOMContentLoaded', () => {
             textarea.placeholder = placeholders[tableType] || 'Digite a descrição da transação...';
         } else {
             document.getElementById('input-section').style.display = 'none';
+        }
+    });
+
+    // Event listener para o botão de enviar para IA
+    document.getElementById('ai-submit').addEventListener('click', async () => {
+        const tableType = document.getElementById('table-select').value;
+        const description = document.getElementById('ai-description').value.trim();
+
+        if (!tableType || !description) {
+            alert('Selecione uma tabela e digite uma descrição.');
+            return;
+        }
+
+        // Mostrar loading
+        document.getElementById('ai-loading').style.display = 'block';
+        document.getElementById('ai-submit').disabled = true;
+
+        try {
+            // Determinar se é receita ou despesa
+            const isReceita = tableType.startsWith('receitas');
+            const type = isReceita ? 'receitas' : 'despesas';
+            const subType = tableType.includes('recorrentes') ? 'recorrente' : tableType.includes('fixas') ? 'fixa' : 'variavel';
+
+            // Primeiro, chamar /process-category para determinar categoria
+            const categoryResponse = await fetch(`${API_URL}/process-category`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    description: description.split(';')[0].trim(), // Usar primeira transação para categoria
+                    categories: isReceita ? 
+                        ['Salário e Rendimentos do Trabalho', 'Renda de Empreendimentos', 'Renda de Aluguéis', 'Investimentos', 'Juros e Rendimentos Financeiros', 'Presentes, Doações e Heranças', 'Venda de Bens e Ativos'] :
+                        ['Moradia', 'Transporte', 'Alimentação', 'Saúde', 'Educação', 'Lazer e Entretenimento', 'Vestuário e Cuidados Pessoais', 'Seguros e Proteção', 'Serviços Financeiros', 'Tecnologia e Comunicação', 'Filhos e Dependentes', 'Impostos e Obrigações Legais', 'Serviços Domésticos', 'Compras e Consumo', 'Outros'],
+                    userId
+                })
+            });
+
+            const categoryData = await categoryResponse.json();
+            const category = categoryData.category;
+
+            // Obter subcategorias baseadas na categoria
+            const subcategories = getSubcategoriesForCategory(category, type);
+
+            // Chamar /process-subcategory
+            const subResponse = await fetch(`${API_URL}/process-subcategory`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    description,
+                    category,
+                    subcategories,
+                    userId,
+                    isReceita
+                })
+            });
+
+            const transactions = await subResponse.json();
+
+            // Adicionar cada transação à tabela
+            transactions.forEach(trans => {
+                addTransactionToTable(tableType, trans);
+            });
+
+            // Fechar modal
+            closeAiModal();
+
+        } catch (error) {
+            console.error('Erro ao processar com IA:', error);
+            alert('Erro ao processar com IA. Tente novamente.');
+        } finally {
+            // Esconder loading
+            document.getElementById('ai-loading').style.display = 'none';
+            document.getElementById('ai-submit').disabled = false;
         }
     });
 

@@ -737,57 +737,47 @@ function openModal() {
     });
 
     // Função para formatar valor como moeda
-    function formatCurrencyValue(value) {
-        const num = parseFloat(value);
-        if (isNaN(num)) return '';
-        return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
+function formatCurrencyValue(value) {
+    const num = parseFloat(value);
+    if (isNaN(num)) return '';
+    return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
 
     // Event listeners para botões
     document.getElementById('close-modal').onclick = () => {
         modal.style.display = 'none';
     };
+    document.getElementById('ai-submit').onclick = async () => {
+    const tableType = tableSelect.value;
+    const description = document.getElementById('ai-description').value.trim();
+    console.log('🚀 [ai-submit] Botão clicado');
+    console.log('📊 Tabela selecionada:', tableType);
+    console.log('📝 Descrição:', description);
+    
+    if (!tableType || !description) return alert('Selecione a tabela e digite uma descrição.');
 
-    // Adicionar event listener para ai-submit apenas se não foi adicionado ainda
-    if (!modal.aiSubmitListenerAdded) {
-        document.getElementById('ai-submit').addEventListener('click', async () => {
-            const aiSubmitBtn = document.getElementById('ai-submit');
-            const tableType = tableSelect.value;
-            const description = document.getElementById('ai-description').value.trim();
-            console.log('🚀 [ai-submit] Botão clicado');
-            console.log('📊 Tabela selecionada:', tableType);
-            console.log('📝 Descrição:', description);
-            
-            if (!tableType || !description) return alert('Selecione a tabela e digite uma descrição.');
-
-            // Desabilitar botão para prevenir cliques múltiplos
-            aiSubmitBtn.disabled = true;
-            document.getElementById('ai-loading').style.display = 'block';
-            try {
-                console.log('⏳ Processando com IA...');
-                const results = await processWithAI(description, tableType); // Agora retorna array
-                console.log('✅ Resultados recebidos:', results);
-                
-                // Iterar sobre cada transação e criar linha
-                console.log(`📝 Criando ${results.length} linha(s)...`);
-                results.forEach((result, index) => {
-                    console.log(`📄 Preenchendo linha ${index + 1}:`, result);
-                    fillRowWithAI(null, tableType, result);
-                });
-                
-                console.log('✅ Todas as linhas criadas com sucesso!');
-                modal.style.display = 'none';
-            } catch (error) {
-                console.error('❌ [ai-submit] Erro completo:', error);
-                alert('Erro ao processar com IA. Tente novamente.');
-            } finally {
-                document.getElementById('ai-loading').style.display = 'none';
-                aiSubmitBtn.disabled = false;
-            }
+    document.getElementById('ai-loading').style.display = 'block';
+    try {
+        console.log('⏳ Processando com IA...');
+        const results = await processWithAI(description, tableType); // Agora retorna array
+        console.log('✅ Resultados recebidos:', results);
+        
+        // Iterar sobre cada transação e criar linha
+        console.log(`📝 Criando ${results.length} linha(s)...`);
+        results.forEach((result, index) => {
+            console.log(`📄 Preenchendo linha ${index + 1}:`, result);
+            fillRowWithAI(null, tableType, result);
         });
-        modal.aiSubmitListenerAdded = true;
+        
+        console.log('✅ Todas as linhas criadas com sucesso!');
+        modal.style.display = 'none';
+    } catch (error) {
+        console.error('❌ [ai-submit] Erro completo:', error);
+        alert('Erro ao processar com IA. Tente novamente.');
+    } finally {
+        document.getElementById('ai-loading').style.display = 'none';
     }
-}
+};
 }
 
 // Função para fechar o modal de IA
