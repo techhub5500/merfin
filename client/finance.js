@@ -9,6 +9,11 @@ function getSubcategoriesForCategory(type, category) {
     return subcategoriesMap[type] && subcategoriesMap[type][category] ? subcategoriesMap[type][category] : [];
 }
 
+// Função auxiliar para adicionar transação à tabela (compatibilidade)
+function addTransactionToTable(tableType, data) {
+    fillRowWithAI(null, tableType, data);
+}
+
 function updateStatusSelectStyle(select) {
     const value = select.value;
     if (value === 'Recebido' || value === 'Pago') {
