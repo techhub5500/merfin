@@ -4,6 +4,11 @@
 
 let exampleDataAdded = false;
 
+// Função auxiliar para obter subcategorias (compatibilidade)
+function getSubcategoriesForCategory(type, category) {
+    return subcategoriesMap[type] && subcategoriesMap[type][category] ? subcategoriesMap[type][category] : [];
+}
+
 function updateStatusSelectStyle(select) {
     const value = select.value;
     if (value === 'Recebido' || value === 'Pago') {
