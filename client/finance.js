@@ -1371,99 +1371,11 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal();
     });
 
-    // Event listener para o select de tabela
-    document.getElementById('table-select').addEventListener('change', () => {
-        const tableType = document.getElementById('table-select').value;
-        const textarea = document.getElementById('ai-description');
-        if (tableType) {
-            showInputSection();
-            // Definir placeholder baseado na tabela selecionada
-            const placeholders = {
-                'receitas-recorrentes': 'Ex: Recebi R$ 5000 de salário mensal; Recebi R$ 1200 de freelance recorrente; Recebi R$ 800 de aluguel mensal',
-                'receitas-variaveis': 'Ex: Recebi R$ 2000 de bônus; Recebi R$ 500 de venda extra; Recebi R$ 300 de presente',
-                'despesas-fixas': 'Ex: Paguei R$ 1500 de aluguel; Paguei R$ 100 de internet; Paguei R$ 300 de financiamento',
-                'despesas-variaveis': 'Ex: Paguei R$ 200 de supermercado; Paguei R$ 50 de transporte; Paguei R$ 150 de jantar'
-            };
-            textarea.placeholder = placeholders[tableType] || 'Digite a descrição da transação...';
-        } else {
-            document.getElementById('input-section').style.display = 'none';
-        }
-    });
+    // Event listener para o select de tabela removido - já está implementado em app.js
 
-    // Event listener para o botão de enviar para IA
-    document.getElementById('ai-submit').addEventListener('click', async () => {
-        const tableType = document.getElementById('table-select').value;
-        const description = document.getElementById('ai-description').value.trim();
+    // Event listener para o botão de enviar para IA removido - já está implementado em app.js
 
-        if (!tableType || !description) {
-            alert('Selecione uma tabela e digite uma descrição.');
-            return;
-        }
-
-        // Mostrar loading
-        document.getElementById('ai-loading').style.display = 'block';
-        document.getElementById('ai-submit').disabled = true;
-
-        try {
-            // Determinar se é receita ou despesa
-            const isReceita = tableType.startsWith('receitas');
-            const type = isReceita ? 'receitas' : 'despesas';
-            const subType = tableType.includes('recorrentes') ? 'recorrente' : tableType.includes('fixas') ? 'fixa' : 'variavel';
-
-            // Primeiro, chamar /process-category para determinar categoria
-            const categoryResponse = await fetch(`${API_URL}/process-category`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    description: description.split(';')[0].trim(), // Usar primeira transação para categoria
-                    categories: isReceita ? 
-                        ['Salário e Rendimentos do Trabalho', 'Renda de Empreendimentos', 'Renda de Aluguéis', 'Investimentos', 'Juros e Rendimentos Financeiros', 'Presentes, Doações e Heranças', 'Venda de Bens e Ativos'] :
-                        ['Moradia', 'Transporte', 'Alimentação', 'Saúde', 'Educação', 'Lazer e Entretenimento', 'Vestuário e Cuidados Pessoais', 'Seguros e Proteção', 'Serviços Financeiros', 'Tecnologia e Comunicação', 'Filhos e Dependentes', 'Impostos e Obrigações Legais', 'Serviços Domésticos', 'Compras e Consumo', 'Outros'],
-                    userId
-                })
-            });
-
-            const categoryData = await categoryResponse.json();
-            const category = categoryData.category;
-
-            // Obter subcategorias baseadas na categoria
-            const subcategories = getSubcategoriesForCategory(category, type);
-
-            // Chamar /process-subcategory
-            const subResponse = await fetch(`${API_URL}/process-subcategory`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    description,
-                    category,
-                    subcategories,
-                    userId,
-                    isReceita
-                })
-            });
-
-            const transactions = await subResponse.json();
-
-            // Adicionar cada transação à tabela
-            transactions.forEach(trans => {
-                addTransactionToTable(tableType, trans);
-            });
-
-            // Fechar modal
-            closeAiModal();
-
-        } catch (error) {
-            console.error('Erro ao processar com IA:', error);
-            alert('Erro ao processar com IA. Tente novamente.');
-        } finally {
-            // Esconder loading
-            document.getElementById('ai-loading').style.display = 'none';
-            document.getElementById('ai-submit').disabled = false;
-        }
-    });
-
-    // Event listener para fechar modal
-    document.getElementById('close-modal').addEventListener('click', closeAiModal);
+    // Event listeners do modal de IA removidos - já estão implementados em app.js
 
     // Carregar dívidas ao iniciar
     loadDividas();

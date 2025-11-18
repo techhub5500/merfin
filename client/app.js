@@ -646,6 +646,12 @@ function createCategorySelect(type) {
     return select;
 }
 
+// Função para obter subcategorias baseadas na categoria
+function getSubcategoriesForCategory(category, type) {
+    return subcategoriesMap[type]?.[category] || [];
+}
+
+// Função para processar com IA (agora retorna array de transações)
 async function processWithAI(description, tableType) {
     console.log('🔵 [processWithAI] Iniciando processamento');
     console.log('📝 Descrição:', description);
