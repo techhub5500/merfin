@@ -751,6 +751,7 @@ function openModal() {
     // Adicionar event listener para ai-submit apenas se não foi adicionado ainda
     if (!modal.aiSubmitListenerAdded) {
         document.getElementById('ai-submit').addEventListener('click', async () => {
+            const aiSubmitBtn = document.getElementById('ai-submit');
             const tableType = tableSelect.value;
             const description = document.getElementById('ai-description').value.trim();
             console.log('🚀 [ai-submit] Botão clicado');
@@ -759,6 +760,8 @@ function openModal() {
             
             if (!tableType || !description) return alert('Selecione a tabela e digite uma descrição.');
 
+            // Desabilitar botão para prevenir cliques múltiplos
+            aiSubmitBtn.disabled = true;
             document.getElementById('ai-loading').style.display = 'block';
             try {
                 console.log('⏳ Processando com IA...');
@@ -779,6 +782,7 @@ function openModal() {
                 alert('Erro ao processar com IA. Tente novamente.');
             } finally {
                 document.getElementById('ai-loading').style.display = 'none';
+                aiSubmitBtn.disabled = false;
             }
         });
         modal.aiSubmitListenerAdded = true;
