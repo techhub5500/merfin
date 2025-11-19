@@ -683,31 +683,11 @@ function updateDashboard() {
         console.log('⏳ Despesas pendentes:', formatCurrencyValue(despesasPendentes));
         console.log('📈 Saldo acumulado (transações):', formatCurrencyValue(saldoAcumulado));
 
-        // Buscar saldo da conta do perfil (SEMPRE incluir)
-        fetch(`${API_URL}/profile/${userId}`)
-        .then(response => response.json())
-        .then(profile => {
-            const saldoConta = parseCurrency(profile.financeira?.saldoConta || '0');
-            const saldoLiquido = saldoAcumulado + saldoConta;
-            
-            console.log('🏦 Saldo da conta (perfil):', formatCurrencyValue(saldoConta));
-            console.log('✅ Saldo líquido final:', formatCurrencyValue(saldoLiquido));
-
-            document.getElementById('saldo-liquido').textContent = formatCurrencyValue(saldoLiquido);
-            document.getElementById('total-receitas').textContent = formatCurrencyValue(receitasMesAtual);
-            document.getElementById('total-despesas').textContent = formatCurrencyValue(despesasMesAtual);
-            document.getElementById('receitas-pendentes').textContent = formatCurrencyValue(receitasPendentes);
-            document.getElementById('despesas-pendentes').textContent = formatCurrencyValue(despesasPendentes);
-        })
-        .catch(error => {
-            console.error('Erro ao carregar perfil para dashboard:', error);
-            // Fallback sem saldo da conta
-            document.getElementById('saldo-liquido').textContent = formatCurrencyValue(saldoAcumulado);
-            document.getElementById('total-receitas').textContent = formatCurrencyValue(receitasMesAtual);
-            document.getElementById('total-despesas').textContent = formatCurrencyValue(despesasMesAtual);
-            document.getElementById('receitas-pendentes').textContent = formatCurrencyValue(receitasPendentes);
-            document.getElementById('despesas-pendentes').textContent = formatCurrencyValue(despesasPendentes);
-        });
+        document.getElementById('saldo-liquido').textContent = formatCurrencyValue(saldoAcumulado);
+        document.getElementById('total-receitas').textContent = formatCurrencyValue(receitasMesAtual);
+        document.getElementById('total-despesas').textContent = formatCurrencyValue(despesasMesAtual);
+        document.getElementById('receitas-pendentes').textContent = formatCurrencyValue(receitasPendentes);
+        document.getElementById('despesas-pendentes').textContent = formatCurrencyValue(despesasPendentes);
     })
     .catch(error => {
         console.error('Erro ao carregar transações:', error);
@@ -1225,14 +1205,11 @@ function updateCompactDashboard() {
 
     const saldoLiquidoTransacoes = totalReceitas - totalDespesas;
 
-    // Buscar saldo da conta do perfil
+    // Buscar perfil para objetivos e patrimônio
     fetch(`${API_URL}/profile/${userId}`)
     .then(response => response.json())
     .then(profile => {
-        const saldoConta = parseCurrency(profile.financeira?.saldoConta || '0');
-        const saldoLiquido = saldoLiquidoTransacoes + saldoConta;
-
-        document.getElementById('saldo-liquido-compact').textContent = formatCurrencyValue(saldoLiquido);
+        document.getElementById('saldo-liquido-compact').textContent = formatCurrencyValue(saldoLiquidoTransacoes);
         document.getElementById('total-receitas-compact').textContent = formatCurrencyValue(totalReceitas);
         document.getElementById('total-despesas-compact').textContent = formatCurrencyValue(totalDespesas);
 
@@ -1240,15 +1217,15 @@ function updateCompactDashboard() {
         const fundoMeta = parseFloat(objetivos.fundoEmergencia?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
         const longoMeta = parseFloat(objetivos.valorMetaLongo?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
 
-        const progressoEmergencia = fundoMeta > 0 ? Math.min((saldoLiquido / fundoMeta) * 100, 100) : 0;
-        const progressoLongo = longoMeta > 0 ? Math.min((saldoLiquido / longoMeta) * 100, 100) : 0;
+        const progressoEmergencia = fundoMeta > 0 ? Math.min((saldoLiquidoTransacoes / fundoMeta) * 100, 100) : 0;
+        const progressoLongo = longoMeta > 0 ? Math.min((saldoLiquidoTransacoes / longoMeta) * 100, 100) : 0;
 
         document.getElementById('progress-emergencia-compact').style.width = progressoEmergencia + '%';
         document.getElementById('progress-longo-compact').style.width = progressoLongo + '%';
     })
     .catch(error => {
         console.error('Erro ao carregar perfil para dashboard compacto:', error);
-        // Fallback sem saldo da conta
+        // Fallback sem perfil
         document.getElementById('saldo-liquido-compact').textContent = formatCurrencyValue(saldoLiquidoTransacoes);
         document.getElementById('total-receitas-compact').textContent = formatCurrencyValue(totalReceitas);
         document.getElementById('total-despesas-compact').textContent = formatCurrencyValue(totalDespesas);
@@ -1309,7 +1286,6 @@ function saveSection(section) {
         data.contato = document.getElementById('contato').value;
         data.sobreVoce = document.getElementById('sobre-voce').value;
     } else if (section === 'financeira') {
-        data.saldoConta = document.getElementById('saldo-conta').value;
         data.patrimonio = getPatrimonioData();
         data.dependentes = document.getElementById('dependentes').value;
         data.modeloRenda = document.getElementById('modelo-renda').value;
@@ -1343,7 +1319,6 @@ async function loadProfile() {
         document.getElementById('localizacao').value = profile.pessoal?.localizacao || '';
         document.getElementById('contato').value = profile.pessoal?.contato || '';
         document.getElementById('sobre-voce').value = profile.pessoal?.sobreVoce || '';
-        document.getElementById('saldo-conta').value = profile.financeira?.saldoConta || '';
         document.getElementById('dependentes').value = profile.financeira?.dependentes || '';
         document.getElementById('modelo-renda').value = profile.financeira?.modeloRenda || '';
         document.getElementById('poupanca-mensal').value = profile.objetivos?.poupancaMensal || '';

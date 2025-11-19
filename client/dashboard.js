@@ -258,17 +258,10 @@ function updateDashboardSummary() {
         console.log('💸 [Dashboard] Despesas mês atual:', formatCurrencyValue(totalDespesas));
         console.log('📈 [Dashboard] Saldo acumulado (transações):', formatCurrencyValue(saldoAcumulado));
 
-        // Buscar saldo da conta do perfil (SEMPRE incluir)
+        // Calcular patrimônio total (sempre do perfil atual, não acumulado)
         fetch(`${API_URL}/profile/${window.userId}`)
         .then(response => response.json())
         .then(profile => {
-            const saldoConta = parseCurrency(profile.financeira?.saldoConta || '0');
-            const saldoLiquido = saldoAcumulado + saldoConta;
-            
-            console.log('🏦 [Dashboard] Saldo da conta (perfil):', formatCurrencyValue(saldoConta));
-            console.log('✅ [Dashboard] Saldo líquido final:', formatCurrencyValue(saldoLiquido));
-
-            // Calcular patrimônio total (sempre do perfil atual, não acumulado)
             const patrimonioData = profile.financeira?.patrimonio || [];
             const patrimonioTotal = patrimonioData.reduce((sum, item) => {
                 const valor = parseCurrency(item?.valor || '0');
@@ -305,14 +298,14 @@ function updateDashboardSummary() {
             const dashDespesas = document.getElementById('dash-total-despesas');
             const dashPatrimonio = document.getElementById('dash-patrimonio-total');
 
-            if (dashSaldo) dashSaldo.textContent = formatCurrencyValue(saldoLiquido);
+            if (dashSaldo) dashSaldo.textContent = formatCurrencyValue(saldoAcumulado);
             if (dashReceitas) dashReceitas.textContent = formatCurrencyValue(totalReceitas);
             if (dashDespesas) dashDespesas.textContent = formatCurrencyValue(totalDespesas);
             if (dashPatrimonio) dashPatrimonio.textContent = formatCurrencyValue(patrimonioTotal);
         })
         .catch(error => {
             console.error('Erro ao carregar perfil para dashboard:', error);
-            // Fallback sem saldo da conta - usar saldo acumulado das transações
+            // Fallback sem patrimônio - usar apenas transações
             const dashSaldo = document.getElementById('dash-saldo-liquido');
             const dashReceitas = document.getElementById('dash-total-receitas');
             const dashDespesas = document.getElementById('dash-total-despesas');
