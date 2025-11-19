@@ -217,7 +217,7 @@ function detectMonthInMessage(message) {
   return null; // Usar mês corrente
 }
 
-// Função para calcular dados do dashboard
+// Função para calcular dados do dashboard (mês atual)
 function calculateDashboardData(transactions, profile, mesReferencia) {
   let totalReceitas = 0;
   let totalDespesas = 0;
@@ -276,6 +276,27 @@ function calculateDashboardData(transactions, profile, mesReferencia) {
   };
 }
 
+// Função para calcular saldo acumulado até um mês de referência
+function calculateAccumulatedBalance(userId, mesReferencia) {
+  return Transaction.find({
+    userId,
+    mesReferencia: { $lte: mesReferencia }
+  }).then(transactions => {
+    let totalReceitas = 0;
+    let totalDespesas = 0;
+
+    transactions.forEach(t => {
+      if (t.type === 'receitas' && t.status === 'Recebido') {
+        totalReceitas += t.valor;
+      } else if (t.type === 'despesas' && t.status === 'Pago') {
+        totalDespesas += t.valor;
+      }
+    });
+
+    return totalReceitas - totalDespesas;
+  });
+}
+
 // Rota para chat com DeepSeek
 app.post('/chat', async (req, res) => {
   const { message, userId, conversationId } = req.body;
@@ -283,6 +304,7 @@ app.post('/chat', async (req, res) => {
     // Buscar dados do usuário no MongoDB
     const profile = await Profile.findOne({ userId });
     const transactions = await Transaction.find({ userId }).sort({ data: -1 }).limit(10); // Últimas 10 transações
+    const dividas = await Divida.findOne({ userId }); // Buscar dívidas do usuário
 
     // Determinar mês para dashboard (corrente por padrão, ou detectado na mensagem)
     let dashboardMonth = getCurrentMonth();
@@ -297,8 +319,14 @@ app.post('/chat', async (req, res) => {
       mesReferencia: dashboardMonth
     });
 
-    // Calcular dados do dashboard
+    // Calcular dados do dashboard (mês atual)
     const dashboardData = calculateDashboardData(dashboardTransactions, profile, dashboardMonth);
+
+    // Calcular saldo acumulado até o mês atual
+    const saldoAcumulado = await calculateAccumulatedBalance(userId, dashboardMonth);
+
+    // Atualizar o dashboardData com o saldo acumulado correto
+    dashboardData.totais.saldoLiquido = `R$ ${saldoAcumulado.toFixed(2)}`;
 
     // Buscar histórico da conversa atual (últimas 4 mensagens)
     const conversationHistory = await ChatMessage.find({
@@ -306,12 +334,12 @@ app.post('/chat', async (req, res) => {
       userId
     }).sort({ timestamp: -1 }).limit(4).sort({ timestamp: 1 }); // Buscar últimas 4, depois ordenar cronologicamente
 
-    console.log('🔍 [CHAT] Histórico encontrado:', conversationHistory.length, 'mensagens');
-
     // Construir contexto financeiro expandido
     let context = `Você é Merfin, uma IA especializada em organização e planejamento financeiro, criada pela Merfin. Ajude o usuário com suas finanças de forma clara e útil. Jamais diga que voce é a deppsick, voce foi criada pela empresa merfin.
 
 Não empurre informações ou analises logo de cara, a não ser que o usuario pedir. Por exemplo: Se o usuairo mandar um "oi" como vai", responda de forma breve e educada, sem entrar em detalhes financeiros.
+
+Não repita saudações desnecessárias como "Olá" ou cumprimentos iniciais. Responda diretamente à mensagem atual, considerando o histórico da conversa para manter a continuidade natural.
 
 Todas as suas respostas devem ser baseadas nos dados financeiros do usuário (perfil, transações, dashboard) e nos objetivos financeiros definidos, fornecendo conselhos personalizados e alinhados com a saúde financeira atual.
 
@@ -338,6 +366,9 @@ PERFIL:
       context += `Objetivos financeiros: ${JSON.stringify(profile.objetivos)}\n`;
     }
 
+    // Incluir dívidas no contexto
+    context += `Dívidas e Parcelamentos Ativos: ${JSON.stringify(dividas?.dividas || [])}\n`;
+
     context += `
 DASHBOARD DO MÊS ${dashboardMonth === getCurrentMonth() ? 'CORRENTE' : 'SOLICITADO'} (${dashboardMonth}):
 ${JSON.stringify(dashboardData)}
@@ -345,9 +376,9 @@ ${JSON.stringify(dashboardData)}
 Data atual: ${new Date().toLocaleDateString('pt-BR')} (${new Date().toISOString().split('T')[0]})
 
 Nota importante sobre os dados financeiros:
-- O saldo líquido enviado é ACUMULADO desde o início de todas as transações (receitas recebidas - despesas pagas até o mês atual).
-- Para calcular o saldo de UM MÊS ESPECÍFICO, você deve fazer a conta básica: receitas do mês - despesas do mês (apenas valores efetivamente recebidos/pagos).
-- Os valores de receitas e despesas no dashboard representam transações já realizadas no mês. Não são valores previstos ou orçados, mas efetivamente executados.
+- O saldo líquido mostrado é ACUMULADO desde o início de todas as transações até o mês atual (receitas recebidas - despesas pagas).
+- Os valores de receitas e despesas no dashboard representam apenas o mês atual.
+- Para calcular o saldo de UM MÊS ESPECÍFICO, você deve analisar as transações daquele mês individualmente.
 - Use a data atual para contextualizar (ex.: início do mês, meio do mês, final do mês) ao dar conselhos sobre planejamento futuro.
 
 TRANSAÇÕES RECENTES:
@@ -365,9 +396,6 @@ TRANSAÇÕES RECENTES:
         const sender = msg.sender === 'user' ? 'Usuário' : 'Merfin';
         context += `${sender}: ${msg.message}\n`;
       });
-      console.log('🔍 [CHAT] Histórico incluído no contexto');
-    } else {
-      console.log('🔍 [CHAT] Nenhum histórico encontrado');
     }
 
     context += `
