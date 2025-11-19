@@ -363,7 +363,31 @@ PERFIL:
       const financeiraSemSaldo = { ...profile.financeira };
       delete financeiraSemSaldo['saldo-conta'];
       context += `Situação financeira: ${JSON.stringify(financeiraSemSaldo)}\n`;
-      context += `Objetivos financeiros: ${JSON.stringify(profile.objetivos)}\n`;
+      // Excluir meta de poupança mensal dos objetivos
+      const objetivosSemPoupanca = { ...profile.objetivos };
+      delete objetivosSemPoupanca['poupanca-mensal'];
+      
+      // Formatar objetivos com clareza sobre serem metas
+      context += `Objetivos financeiros (metas a serem alcançadas, não valores já investidos/poupados):\n`;
+      if (objetivosSemPoupanca.fundoEmergencia) {
+        context += `- Fundo de emergência: ${objetivosSemPoupanca.fundoEmergencia} (meta para reserva financeira)\n`;
+      }
+      if (objetivosSemPoupanca.prazoEmergencia) {
+        context += `- Prazo para fundo de emergência: ${objetivosSemPoupanca.prazoEmergencia}\n`;
+      }
+      if (objetivosSemPoupanca.investimentoMensal) {
+        context += `- Meta de investimento mensal: ${objetivosSemPoupanca.investimentoMensal} (valor desejado para investir mensalmente, não valor já investido)\n`;
+      }
+      if (objetivosSemPoupanca.metaLongoPrazo) {
+        context += `- Meta de longo prazo: ${objetivosSemPoupanca.metaLongoPrazo}\n`;
+      }
+      if (objetivosSemPoupanca.valorMetaLongo) {
+        context += `- Valor da meta de longo prazo: ${objetivosSemPoupanca.valorMetaLongo}\n`;
+      }
+      if (objetivosSemPoupanca.prazoMetaLongo) {
+        context += `- Prazo para meta de longo prazo: ${objetivosSemPoupanca.prazoMetaLongo}\n`;
+      }
+      context += `\n`;
     }
 
     // Incluir dívidas no contexto
@@ -404,7 +428,7 @@ Mensagem atual do usuário: ${message}`;
     const response = await axios.post('https://api.deepseek.com/v1/chat/completions', {
       model: 'deepseek-chat',
       messages: [{ role: 'user', content: context }],
-      max_tokens: 500 // Aumentado para respostas mais completas
+      max_tokens: 1500 // Aumentado para respostas mais completas
     }, {
       headers: {
         'Authorization': `Bearer ${process.env.DEEPSICK_API}`,
@@ -489,7 +513,7 @@ Responda APENAS com o array JSON, sem texto adicional.`;
       const response = await axios.post('https://api.deepseek.com/v1/chat/completions', {
         model: 'deepseek-chat',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 500 // Aumentado para suportar múltiplas transações
+        max_tokens: 1500 // Aumentado para suportar múltiplas transações
       }, {
         headers: {
           'Authorization': `Bearer ${process.env.DEEPSICK_API}`,
@@ -582,6 +606,12 @@ Responda APENAS com o array JSON, sem texto adicional.`;
 app.post('/save-profile', async (req, res) => {
   try {
     const { userId, section, data } = req.body;
+    
+    // Limpar campos removidos
+    if (section === 'objetivos' && data.poupancaMensal) {
+      delete data.poupancaMensal;
+    }
+    
     const update = { [section]: data };
     await Profile.findOneAndUpdate({ userId }, update, { upsert: true, new: true });
     res.status(200).send('Perfil salvo com sucesso');

@@ -1290,7 +1290,6 @@ function saveSection(section) {
         data.dependentes = document.getElementById('dependentes').value;
         data.modeloRenda = document.getElementById('modelo-renda').value;
     } else if (section === 'objetivos') {
-        data.poupancaMensal = document.getElementById('poupanca-mensal').value;
         data.fundoEmergencia = document.getElementById('fundo-emergencia').value;
         data.prazoEmergencia = document.getElementById('prazo-emergencia').value;
         data.investimentoMensal = document.getElementById('investimento-mensal').value;
