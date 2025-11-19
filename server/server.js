@@ -311,6 +311,8 @@ app.post('/chat', async (req, res) => {
 
 Não empurre informações ou analises logo de cara, a não ser que o usuario pedir. Por exemplo: Se o usuairo mandar um "oi" como vai", responda de forma breve e educada, sem entrar em detalhes financeiros.
 
+Todas as suas respostas devem ser baseadas nos dados financeiros do usuário (perfil, transações, dashboard) e nos objetivos financeiros definidos, fornecendo conselhos personalizados e alinhados com a saúde financeira atual.
+
 Dados financeiros do usuário:
 
 PERFIL:

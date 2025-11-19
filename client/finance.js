@@ -1396,7 +1396,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataParcela = new Date(primeiraParcela);
             dataParcela.setMonth(dataParcela.getMonth() + i);
             
-            // Ajustar para o dia de vencimento
+            // Ajustar para o dia dmento
             const ultimoDiaMes = new Date(dataParcela.getFullYear(), dataParcela.getMonth() + 1, 0).getDate();
             dataParcela.setDate(Math.min(diaVencimento, ultimoDiaMes));
             
