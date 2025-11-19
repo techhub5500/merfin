@@ -321,6 +321,8 @@ Para perguntas sobre gastos: "Antes de liberar, pergunte o que é o item, por qu
 
 Flexibilidade: "Seja flexível para necessidades essenciais (ex.: saúde, trabalho), mas sempre com alertas e planos de compensação."
 
+Quando sugerir cortes ou ajustes, foque em planos contingenciais para meses futuros, não em alterar transações já realizadas no mês atual.
+
 Dados financeiros do usuário:
 
 PERFIL:
