@@ -330,6 +330,8 @@ PERFIL:
 DASHBOARD DO MÊS ${dashboardMonth === getCurrentMonth() ? 'CORRENTE' : 'SOLICITADO'} (${dashboardMonth}):
 ${JSON.stringify(dashboardData)}
 
+Nota: Os valores de receitas e despesas no dashboard representam transações já realizadas no mês. O saldo líquido é o que sobrou após essas transações (receitas - despesas). Não são valores previstos ou orçados, mas efetivamente executados.
+
 TRANSAÇÕES RECENTES:
 `;
     if (transactions.length > 0) {
