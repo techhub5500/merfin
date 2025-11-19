@@ -1086,11 +1086,17 @@ async function updateObjetivosFinanceiros() {
 
         container.innerHTML = '';
 
-        // Fundo de emergência
+        // Obter saldo líquido atual
+        const saldoAtual = parseCurrency(document.getElementById('dash-saldo-liquido')?.textContent || '0');
+
+        // Alocação sequencial: primeiro Fundo de Emergência, depois Meta de Longo Prazo
+        let saldoDisponivel = saldoAtual;
+
+        // Fundo de emergência (prioridade 1)
         if (objetivos.fundoEmergencia) {
             const meta = parseCurrency(objetivos.fundoEmergencia);
-            const saldoAtual = parseCurrency(document.getElementById('dash-saldo-liquido')?.textContent || '0');
-            const progresso = meta > 0 ? Math.min((saldoAtual / meta) * 100, 100) : 0;
+            const alocado = Math.min(saldoDisponivel, meta);
+            const progresso = meta > 0 ? (alocado / meta) * 100 : 0;
 
             container.innerHTML += `
                 <div class="objetivo-item">
@@ -1102,18 +1108,21 @@ async function updateObjetivosFinanceiros() {
                         <div class="objetivo-progress-fill" style="width: ${progresso}%"></div>
                     </div>
                     <div class="objetivo-valores">
-                        <span>${formatCurrencyValue(saldoAtual)}</span>
+                        <span>${formatCurrencyValue(alocado)}</span>
                         <span>${formatCurrencyValue(meta)}</span>
                     </div>
                 </div>
             `;
+
+            // Subtrair do saldo disponível
+            saldoDisponivel -= alocado;
         }
 
-        // Meta de longo prazo
+        // Meta de longo prazo (prioridade 2)
         if (objetivos.metaLongoPrazo && objetivos.valorMetaLongo) {
             const meta = parseCurrency(objetivos.valorMetaLongo);
-            const saldoAtual = parseCurrency(document.getElementById('dash-saldo-liquido')?.textContent || '0');
-            const progresso = meta > 0 ? Math.min((saldoAtual / meta) * 100, 100) : 0;
+            const alocado = Math.min(saldoDisponivel, meta);
+            const progresso = meta > 0 ? (alocado / meta) * 100 : 0;
 
             container.innerHTML += `
                 <div class="objetivo-item">
@@ -1125,11 +1134,14 @@ async function updateObjetivosFinanceiros() {
                         <div class="objetivo-progress-fill" style="width: ${progresso}%"></div>
                     </div>
                     <div class="objetivo-valores">
-                        <span>${formatCurrencyValue(saldoAtual)}</span>
+                        <span>${formatCurrencyValue(alocado)}</span>
                         <span>${formatCurrencyValue(meta)}</span>
                     </div>
                 </div>
             `;
+
+            // Subtrair do saldo disponível (opcional, para futuras metas)
+            saldoDisponivel -= alocado;
         }
 
         if (container.innerHTML === '') {
