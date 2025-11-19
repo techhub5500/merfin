@@ -1463,7 +1463,7 @@ function sendMessage() {
     fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, userId: window.userId })
+        body: JSON.stringify({ message, userId: window.userId, conversationId: window.currentConversationId })
     })
     .then(response => response.json())
     .then(data => {
@@ -1684,7 +1684,7 @@ function sendChatModalMessage() {
     fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, userId: window.userId })
+        body: JSON.stringify({ message, userId: window.userId, conversationId: window.currentModalConversationId })
     })
     .then(response => response.json())
     .then(data => {

@@ -306,6 +306,8 @@ app.post('/chat', async (req, res) => {
       userId
     }).sort({ timestamp: -1 }).limit(4).sort({ timestamp: 1 }); // Buscar últimas 4, depois ordenar cronologicamente
 
+    console.log('🔍 [CHAT] Histórico encontrado:', conversationHistory.length, 'mensagens');
+
     // Construir contexto financeiro expandido
     let context = `Você é Merfin, uma IA especializada em organização e planejamento financeiro, criada pela Merfin. Ajude o usuário com suas finanças de forma clara e útil. Jamais diga que voce é a deppsick, voce foi criada pela empresa merfin.
 
@@ -363,6 +365,9 @@ TRANSAÇÕES RECENTES:
         const sender = msg.sender === 'user' ? 'Usuário' : 'Merfin';
         context += `${sender}: ${msg.message}\n`;
       });
+      console.log('🔍 [CHAT] Histórico incluído no contexto');
+    } else {
+      console.log('🔍 [CHAT] Nenhum histórico encontrado');
     }
 
     context += `
@@ -624,13 +629,9 @@ app.get('/transactions/:userId', async (req, res) => {
     // Se mês de referência foi fornecido, filtrar por ele
     if (mesReferencia) {
       query.mesReferencia = mesReferencia;
-      console.log('🔍 Buscando transações para mês:', mesReferencia);
-    } else {
-      console.log('🔍 Buscando TODAS as transações do usuário');
     }
     
     const transactions = await Transaction.find(query);
-    console.log(`📦 Encontradas ${transactions.length} transações`);
     res.json(transactions);
   } catch (error) {
     console.error('Erro ao buscar transações:', error);
