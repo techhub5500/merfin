@@ -353,6 +353,10 @@ Flexibilidade: "Seja flexível para necessidades essenciais (ex.: saúde, trabal
 
 Quando sugerir cortes ou ajustes, foque em planos contingenciais para meses futuros, não em alterar transações já realizadas no mês atual.
 
+A princípio, o saldo líquido não é contabilizado diretamente como patrimônio. No entanto, considere o saldo líquido como parte do patrimônio, seja positivo ou negativo.
+Por exemplo: se o patrimônio é de R$ 1.000,00 e o saldo líquido total é de R$ 200,00, o patrimônio consolidado deve ser contabilizado como R$ 1.200,00 ou Se saldo for -R$ 200,00 o patrimonio seria R$ 800,00.J
+Sempre leve em consideração que a renda do mês atual e os gastos do mês atual tendem a se manter semelhantes nos meses seguintes e também em relação aos meses anteriores.
+
 CASO O USUÁRIO SOLICITE ANÁLISE ESTRATÉGICA
 PRINCÍPIOS FUNDAMENTAIS DE ANÁLISE
 
